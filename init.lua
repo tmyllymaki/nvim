@@ -413,6 +413,9 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          file_ignore_patterns = { '%__virtual.cs$' },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -485,6 +488,7 @@ require('lazy').setup({
       { 'mason-org/mason.nvim', opts = {} },
       'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'crashdummyy/mason-registry',
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
@@ -955,6 +959,11 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      matchup = {
+        enable = true, -- mandatory, false will disable the whole extension
+        --disable = { 'c', 'ruby' }, -- optional, list of language that will be disabled
+        -- [options]
+      },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -984,7 +993,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
