@@ -9,7 +9,7 @@ return {
     enabled = true,
   },
   {
-    'seblj/roslyn.nvim',
+    'seblyng/roslyn.nvim',
     ft = { 'cs', 'razor' },
     dependencies = {
       {
@@ -25,7 +25,6 @@ return {
         -- By loading as a dependencies, we ensure that we are available to set
         -- the handlers for roslyn
         'tris203/rzls.nvim',
-        --commit = '60cb1e722e48a97400ec4a0665f6a76529052bcf',
         config = function()
           ---@diagnostic disable-next-line: missing-fields
           require('rzls').setup {}
@@ -35,6 +34,7 @@ return {
     config = function()
       require('roslyn').setup {
         args = {
+          '--stdio',
           '--logLevel=Information',
           '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.get_log_path()),
           '--razorSourceGenerator='
@@ -574,7 +574,7 @@ return {
   },
   {
     'andymass/vim-matchup',
-    enabled = true,
+    enabled = false,
     config = function()
       vim.g.matchup_matchparen_offscreen = { method = 'popup' }
     end,
