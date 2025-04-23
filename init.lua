@@ -160,6 +160,8 @@ vim.opt.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.opt.confirm = true
+vim.g.matchparen_timeout = 2
+vim.g.matchparen_insert_timeout = 2
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
