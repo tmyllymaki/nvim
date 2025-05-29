@@ -45,84 +45,6 @@ return {
       },
     },
   },
-  {
-    'seblyng/roslyn.nvim',
-    ft = { 'cs', 'razor' },
-    dependencies = {
-      {
-        'williamboman/mason.nvim',
-        opts = {
-          registries = {
-            'github:mason-org/mason-registry',
-            'github:crashdummyy/mason-registry',
-          },
-        },
-      },
-      {
-        -- By loading as a dependencies, we ensure that we are available to set
-        -- the handlers for roslyn
-        'tris203/rzls.nvim',
-        branch = 'pullDiags',
-        config = function()
-          ---@diagnostic disable-next-line: missing-fields
-          require('rzls').setup {}
-        end,
-      },
-    },
-    config = function()
-      require('roslyn').setup {
-        args = {
-          '--stdio',
-          '--logLevel=Information',
-          '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.get_log_path()),
-          '--razorSourceGenerator='
-            .. vim.fs.joinpath(vim.fn.stdpath 'data' --[[@as string]], 'mason', 'packages', 'roslyn', 'libexec', 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
-          '--razorDesignTimePath=' .. vim.fs.joinpath(
-            vim.fn.stdpath 'data' --[[@as string]],
-            'mason',
-            'packages',
-            'rzls',
-            'libexec',
-            'Targets',
-            'Microsoft.NET.Sdk.Razor.DesignTime.targets'
-          ),
-        },
-        ---@diagnostic disable-next-line: missing-fields
-        config = {
-          handlers = require 'rzls.roslyn_handlers',
-          settings = {
-            ['csharp|inlay_hints'] = {
-              csharp_enable_inlay_hints_for_implicit_object_creation = true,
-              csharp_enable_inlay_hints_for_implicit_variable_types = true,
-
-              csharp_enable_inlay_hints_for_lambda_parameter_types = true,
-              csharp_enable_inlay_hints_for_types = true,
-              dotnet_enable_inlay_hints_for_indexer_parameters = true,
-              dotnet_enable_inlay_hints_for_literal_parameters = true,
-              dotnet_enable_inlay_hints_for_object_creation_parameters = true,
-              dotnet_enable_inlay_hints_for_other_parameters = true,
-              dotnet_enable_inlay_hints_for_parameters = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-              dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-            },
-            ['csharp|code_lens'] = {
-              dotnet_enable_references_code_lens = true,
-            },
-          },
-        },
-      }
-    end,
-    init = function()
-      -- we add the razor filetypes before the plugin loads
-      vim.filetype.add {
-        extension = {
-          razor = 'razor',
-          cshtml = 'razor',
-        },
-      }
-    end,
-  },
   require 'custom.lsp.nvim-dap',
   {
     'Cliffback/netcoredbg-macOS-arm64.nvim',
@@ -130,29 +52,30 @@ return {
   },
   {
     'GustavEikaas/easy-dotnet.nvim',
-    -- 'nvim-telescope/telescope.nvim' or 'ibhagwan/fzf-lua'
+    -- 'nvim-telescope/telescope.nvim' or 'ibhagwan/fzf-lua' or 'folke/snacks.nvim'
     -- are highly recommended for a better experience
     dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
     config = function()
       local function get_secret_path(secret_guid)
+        local path = ''
         local home_dir = vim.fn.expand '~'
         local secret_path = home_dir .. '/.microsoft/usersecrets/' .. secret_guid .. '/secrets.json'
-        return secret_path
+        path = secret_path
+        return path
       end
 
       local dotnet = require 'easy-dotnet'
       -- Options are not required
       dotnet.setup {
-        --Optional function to return the path for the dotnet sdk (e.g C:/ProgramFiles/dotnet/sdk/8.0.0)
-        -- easy-dotnet will resolve the path automatically if this argument is omitted, for a performance improvement you can add a function that returns a hardcoded string
-        -- You should define this function to return a hardcoded path for a performance improvement 🚀
+        get_sdk_path = function()
+          return '/opt/homebrew/bin/dotnet'
+        end,
         ---@type TestRunnerOptions
         test_runner = {
           ---@type "split" | "float" | "buf"
           viewmode = 'float',
           enable_buffer_test_execution = true, --Experimental, run tests directly from buffer
           noBuild = true,
-          noRestore = true,
           icons = {
             passed = '',
             skipped = '',
@@ -169,8 +92,7 @@ return {
             run_test_from_buffer = { lhs = '<leader>r', desc = 'run test from buffer' },
             filter_failed_tests = { lhs = '<leader>fe', desc = 'filter failed tests' },
             debug_test = { lhs = '<leader>d', desc = 'debug test' },
-            debug_test_from_buffer = { lhs = '<leader>D', desc = 'debug test from buffer' },
-            go_to_file = { lhs = 'g', desc = 'got to file' },
+            go_to_file = { lhs = 'g', desc = 'go to file' },
             run_all = { lhs = '<leader>R', desc = 'run all tests' },
             run = { lhs = '<leader>r', desc = 'run test' },
             peek_stacktrace = { lhs = '<leader>p', desc = 'peek stacktrace of failed test' },
@@ -183,6 +105,11 @@ return {
           },
           --- Optional table of extra args e.g "--blame crash"
           additional_args = {},
+        },
+        new = {
+          project = {
+            prefix = 'sln', -- "sln" | "none"
+          },
         },
         ---@param action "test" | "restore" | "build" | "run"
         terminal = function(path, action, args)
@@ -200,7 +127,7 @@ return {
               return string.format('dotnet build %s %s', path, args)
             end,
             watch = function()
-              return string.format('dotnet watch %s %s', path, args)
+              return string.format('dotnet watch --project %s %s', path, args)
             end,
           }
 
@@ -219,8 +146,12 @@ return {
           enabled = true,
         },
         -- choose which picker to use with the plugin
-        -- possible values are "telescope" | "fzf" | "basic"
+        -- possible values are "telescope" | "fzf" | "snacks" | "basic"
+        -- if no picker is specified, the plugin will determine
+        -- the available one automatically with this priority:
+        -- telescope -> fzf -> snacks ->  basic
         picker = 'telescope',
+        background_scanning = true,
       }
 
       -- Example command
@@ -228,17 +159,10 @@ return {
         dotnet.secrets()
       end, {})
 
-      vim.keymap.set('n', '<leader>T', function()
-        vim.cmd 'Dotnet testrunner'
-      end)
-
-      vim.keymap.set('n', '<C-p>', function()
-        dotnet.run_project()
-      end)
-
-      vim.keymap.set('n', '<C-b>', function()
-        dotnet.build_default_quickfix()
-      end)
+      -- Example keybinding
+      -- vim.keymap.set('n', '<C-p>', function()
+      --   dotnet.run_project()
+      -- end)
     end,
   },
   {
@@ -610,7 +534,7 @@ return {
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
     lazy = false,
     config = function()
-      require('oil').setup()
+      require('oil').setup {}
     end,
   },
   {
