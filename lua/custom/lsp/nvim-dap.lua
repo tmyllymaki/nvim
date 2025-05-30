@@ -22,10 +22,10 @@ return {
 
     vim.keymap.set('n', '<F5>', dap.continue, {})
 
-    vim.keymap.set('n', 'q', function()
-      dap.close()
-      dapui.close()
-    end, {})
+    -- vim.keymap.set('n', 'q', function()
+    --   dap.close()
+    --   dapui.close()
+    -- end, {})
 
     vim.keymap.set('n', '<F10>', dap.step_over, {})
     vim.keymap.set('n', '<leader>dO', dap.step_over, {})
