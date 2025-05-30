@@ -865,6 +865,9 @@ require('lazy').setup({
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },
+        per_filetype = {
+          codecompanion = { 'codecompanion' },
+        },
       },
 
       snippets = { preset = 'luasnip' },
