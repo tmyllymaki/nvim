@@ -19,7 +19,10 @@ return {
       config = true,
     },
   },
-  config = function()
+  opts = {
+    broad_search = true,
+  },
+  config = function(_, opts)
     local mason_registry = require 'mason-registry'
 
     local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'

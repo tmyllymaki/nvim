@@ -102,9 +102,9 @@ return {
       dotnet.secrets()
     end, {})
 
-    -- Example keybinding
-    -- vim.keymap.set('n', '<C-p>', function()
-    --   dotnet.run_project()
-    -- end)
+    -- dotnet.build_default_quickfix()
+    vim.keymap.set('n', '<leader>mb', function()
+      dotnet.build_default_quickfix()
+    end, { desc = 'Build default project with quickfix' })
   end,
 }

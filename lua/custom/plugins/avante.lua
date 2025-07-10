@@ -20,6 +20,13 @@ return {
     -- for example
     provider = 'copilot',
     auto_suggestions_provider = 'copilot',
+    web_search_engine = {
+      provider = 'searxng', -- tavily, serpapi, google, kagi, brave, or searxng
+    },
+    behaviour = {
+      auto_approve_tool_permissions = true,
+      auto_apply_diff_after_generation = true,
+    },
   },
   dependencies = {
     'nvim-lua/plenary.nvim',
@@ -27,7 +34,7 @@ return {
     --- The below dependencies are optional,
     'echasnovski/mini.pick', -- for file_selector provider mini.pick
     'nvim-telescope/telescope.nvim', -- for file_selector provider telescope
-    'hrsh7th/nvim-cmp', -- autocompletion for avante commands and mentions
+    --'hrsh7th/nvim-cmp', -- autocompletion for avante commands and mentions
     'ibhagwan/fzf-lua', -- for file_selector provider fzf
     'stevearc/dressing.nvim', -- for input provider dressing
     'folke/snacks.nvim', -- for input provider snacks
