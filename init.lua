@@ -208,6 +208,15 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Tab key for accepting Copilot suggestions (IDE-like behavior)
+vim.keymap.set('i', '<Tab>', function()
+  if require('copilot.suggestion').is_visible() then
+    require('copilot.suggestion').accept()
+  else
+    return '<Tab>'
+  end
+end, { desc = 'Accept Copilot suggestion or fallback to Tab', expr = true })
+
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
@@ -440,7 +449,15 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sf', function()
+        -- This is a slightly more advanced example of how to use Telescope.
+        --  It uses `rg` (ripgrep) to find files, excluding the `.git` directory.
+        --  You can change the `find_command` to use any command you want.
+        --  See `:help telescope.builtin.find_files()`
+        builtin.find_files {
+          find_command = { 'rg', '--files', '--iglob', '!.git', '--hidden' },
+        }
+      end, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -782,6 +799,7 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        cs = { 'csharpier' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -828,31 +846,24 @@ require('lazy').setup({
     --- @type blink.cmp.Config
     opts = {
       keymap = {
-        -- 'default' (recommended) for mappings similar to built-in completions
-        --   <c-y> to accept ([y]es) the completion.
-        --    This will auto-import if your LSP supports it.
-        --    This will expand snippets if the LSP sent a snippet.
-        -- 'super-tab' for tab to accept
-        -- 'enter' for enter to accept
-        -- 'none' for no mappings
-        --
-        -- For an understanding of why the 'default' preset is recommended,
-        -- you will need to read `:help ins-completion`
-        --
-        -- No, but seriously. Please read `:help ins-completion`, it is really good!
-        --
-        -- All presets have the following mappings:
-        -- <tab>/<s-tab>: move to right/left of your snippet expansion
-        -- <c-space>: Open menu or open docs if already open
-        -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
-        -- <c-e>: Hide menu
-        -- <c-k>: Toggle signature help
-        --
-        -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'super-tab',
+        -- Use custom keymap for IDE-like behavior
+        preset = 'none',
 
-        -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-        --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        -- Custom keymaps for IDE-like behavior
+        ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
+        ['<C-e>'] = { 'hide', 'fallback' },
+        ['<CR>'] = { 'accept', 'fallback' }, -- Enter accepts blink.cmp completion
+        ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
+        ['<Up>'] = { 'select_prev', 'fallback' },
+        ['<Down>'] = { 'select_next', 'fallback' },
+        ['<C-p>'] = { 'select_prev', 'fallback_to_mappings' },
+        ['<C-n>'] = { 'select_next', 'fallback_to_mappings' },
+        ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
+        ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
+        ['<C-k>'] = { 'show_signature', 'hide_signature', 'fallback' },
+
+        -- Tab will be handled by Copilot for suggestions, and only for snippet navigation in blink.cmp
+        ['<Tab>'] = { 'snippet_forward', 'fallback' },
       },
 
       appearance = {
@@ -868,9 +879,10 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'copilot' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+          copilot = { module = 'blink-cmp-copilot', score_offset = 100 },
         },
         per_filetype = {
           codecompanion = { 'codecompanion' },
@@ -1000,9 +1012,9 @@ require('lazy').setup({
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
@@ -1039,3 +1051,6 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+---
+---- views can only be fully collapsed with the global statusline
+vim.opt.laststatus = 3

@@ -15,7 +15,7 @@ return {
       -- By loading as a dependencies, we ensure that we are available to set
       -- the handlers for roslyn
       'tris203/rzls.nvim',
-      branch = 'main',
+      branch = 'perf',
       config = true,
     },
   },

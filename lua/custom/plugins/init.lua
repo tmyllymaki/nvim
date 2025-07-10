@@ -1,7 +1,44 @@
 return {
   {
     'github/copilot.vim',
-    enabled = true,
+    enabled = false,
+  },
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    config = function()
+      require('copilot').setup({
+        suggestion = {
+          enabled = true,
+          auto_trigger = true,
+          keymap = {
+            accept = false, -- We'll handle this with custom keymap
+            accept_word = false,
+            accept_line = false,
+            next = false,
+            prev = false,
+            dismiss = false,
+          },
+        },
+        panel = { enabled = true },
+        filetypes = {
+          yaml = false,
+          markdown = false,
+          help = false,
+          gitcommit = false,
+          gitrebase = false,
+          hgcommit = false,
+          svn = false,
+          cvs = false,
+          ["."] = false,
+        },
+      })
+    end,
+  },
+  {
+    'giuxtaposition/blink-cmp-copilot',
+    dependencies = { 'zbirenbaum/copilot.lua' },
   },
   {
     'folke/trouble.nvim',
