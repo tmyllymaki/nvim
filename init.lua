@@ -704,15 +704,15 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
+        pyright = {},
+        rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
+        ts_ls = {},
         --
 
         lua_ls = {
@@ -905,7 +905,54 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight-night'
-      vim.cmd.colorscheme 'catppuccin-macchiato'
+      -- vim.cmd.colorscheme 'catppuccin-macchiato'
+      -- Simplified cross-platform function to detect system theme
+      local function get_system_theme()
+        local system = vim.loop.os_uname().sysname
+        if system == 'Darwin' then
+          -- macOS
+          local handle = io.popen 'defaults read -g AppleInterfaceStyle 2>/dev/null'
+          if handle then
+            local result = handle:read '*a'
+            handle:close()
+            return result:match 'Dark' and 'dark' or 'light'
+          end
+        elseif system == 'Linux' then
+          -- KDE Plasma 6 (via kreadconfig6)
+          local kde_handle = io.popen 'kreadconfig6 --file kdeglobals --group General --key ColorScheme 2>/dev/null'
+          if kde_handle then
+            local kde_result = kde_handle:read '*a'
+            kde_handle:close()
+            if kde_result and kde_result:match '[Dd]ark' then
+              return 'dark'
+            elseif kde_result and kde_result:match '[Ll]ight' then
+              return 'light'
+            end
+          end
+        end
+
+        return 'dark' -- fallback to dark theme
+      end
+
+      -- Function to set colorscheme based on system theme
+      local function set_theme_from_system()
+        local system_theme = get_system_theme()
+        if system_theme == 'dark' then
+          vim.cmd.colorscheme 'modus_vivendi'
+        else
+          vim.cmd.colorscheme 'modus_operandi'
+        end
+      end
+
+      -- Set initial theme
+      set_theme_from_system()
+
+      -- Create autocommand to check system theme periodically
+      vim.api.nvim_create_autocmd('FocusGained', {
+        group = vim.api.nvim_create_augroup('SystemThemeSync', { clear = true }),
+        callback = set_theme_from_system,
+        desc = 'Sync colorscheme with system theme when gaining focus',
+      })
     end,
   },
 
@@ -1057,3 +1104,12 @@ nvim_lsp.nixd.setup {
     },
   },
 }
+
+-- Scroll window to right by 5 characters
+vim.keymap.set({ 'n', 'x' }, '<A-h>', '5zh', { desc = 'Scroll window right by 5 characters' })
+vim.keymap.set({ 'n', 'x' }, '<A-l>', '5zl', { desc = 'Scroll window left by 5 characters' })
+
+vim.keymap.set({ 'n' }, '<A-H>', '<Cmd>5wincmd<LT><CR>', { desc = 'Resize window left by 5 columns' })
+vim.keymap.set({ 'n' }, '<A-J>', '<Cmd>5wincmd-<CR>', { desc = 'Resize window down by 5 rows' })
+vim.keymap.set({ 'n' }, '<A-K>', '<Cmd>5wincmd+<CR>', { desc = 'Resize window up by 5 rows' })
+vim.keymap.set({ 'n' }, '<A-L>', '<Cmd>5wincmd><CR>', { desc = 'Resize window right by 5 columns' })
