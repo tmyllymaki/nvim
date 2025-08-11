@@ -784,6 +784,9 @@ require('lazy').setup({
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
+        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+          return
+        end
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
@@ -1113,3 +1116,23 @@ vim.keymap.set({ 'n' }, '<A-H>', '<Cmd>5wincmd<LT><CR>', { desc = 'Resize window
 vim.keymap.set({ 'n' }, '<A-J>', '<Cmd>5wincmd-<CR>', { desc = 'Resize window down by 5 rows' })
 vim.keymap.set({ 'n' }, '<A-K>', '<Cmd>5wincmd+<CR>', { desc = 'Resize window up by 5 rows' })
 vim.keymap.set({ 'n' }, '<A-L>', '<Cmd>5wincmd><CR>', { desc = 'Resize window right by 5 columns' })
+
+vim.opt.swapfile = false
+
+vim.api.nvim_create_user_command('FormatDisable', function(args)
+  if args.bang then
+    -- FormatDisable! will disable formatting just for this buffer
+    vim.b.disable_autoformat = true
+  else
+    vim.g.disable_autoformat = true
+  end
+end, {
+  desc = 'Disable autoformat-on-save',
+  bang = true,
+})
+vim.api.nvim_create_user_command('FormatEnable', function()
+  vim.b.disable_autoformat = false
+  vim.g.disable_autoformat = false
+end, {
+  desc = 'Re-enable autoformat-on-save',
+})
