@@ -857,7 +857,7 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'avante', 'lsp', 'path', 'lazydev' },
+        default = { 'avante', 'lsp', 'easy-dotnet', 'path', 'lazydev' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           copilot = { module = 'blink-cmp-copilot', score_offset = 100 },
@@ -867,6 +867,13 @@ require('lazy').setup({
             opts = {
               -- options for blink-cmp-avante
             },
+          },
+          ['easy-dotnet'] = {
+            name = 'easy-dotnet',
+            enabled = true,
+            module = 'easy-dotnet.completion.blink',
+            score_offset = 10000,
+            async = true,
           },
         },
         per_filetype = {

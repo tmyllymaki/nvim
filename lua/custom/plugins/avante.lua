@@ -19,11 +19,18 @@ return {
     -- add any opts here
     -- for example
     provider = 'copilot',
+    cursor_applying_provider = 'copilot',
     auto_suggestions_provider = 'copilot',
+    providers = {
+      copilot = {
+        model = 'gpt-4.1-2025-04-14',
+      },
+    },
     web_search_engine = {
       provider = 'searxng', -- tavily, serpapi, google, kagi, brave, or searxng
     },
     behaviour = {
+      enable_cursor_planning_mode = true,
       auto_approve_tool_permissions = true,
       auto_apply_diff_after_generation = true,
     },
