@@ -14,6 +14,7 @@ return {
   ---@module 'obsidian'
   ---@type obsidian.config
   opts = {
+    legacy_commands = false,
     workspaces = {
       {
         name = 'personal',
@@ -23,9 +24,9 @@ return {
     -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
     completion = {
       -- Enables completion using nvim_cmp
-      nvim_cmp = true,
+      nvim_cmp = false,
       -- Enables completion using blink.cmp
-      blink = false,
+      blink = true,
       -- Trigger completion at 2 chars.
       min_chars = 2,
       -- Set to false to disable new note creation in the picker
