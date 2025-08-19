@@ -22,7 +22,7 @@ return {
 
     vim.keymap.set('n', '<F5>', dap.continue, {})
 
-    vim.keymap.set('n', 'q', function()
+    vim.keymap.set('n', '<C-q>', function()
       dap.close()
       dapui.close()
     end, {})

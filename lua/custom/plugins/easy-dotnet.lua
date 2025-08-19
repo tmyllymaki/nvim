@@ -106,5 +106,51 @@ return {
     vim.keymap.set('n', '<leader>mb', function()
       dotnet.build_default_quickfix()
     end, { desc = 'Build default project with quickfix' })
+
+    vim.keymap.set('n', '<leader>mw', function()
+      dotnet.watch_default()
+    end, { desc = 'Watch default project' })
+
+    vim.keymap.set('n', '<leader>mpa', function()
+      dotnet.add_package()
+    end, { desc = 'Add Nuget package' })
+
+    vim.keymap.set('n', '<leader>ms', function()
+      dotnet.secrets()
+    end, { desc = 'Open dotnet user-secrets' })
+
+    vim.keymap.set('n', '<leader>ma', function()
+      local telescope = require 'telescope.builtin'
+      local actions = require 'telescope.actions'
+      local action_state = require 'telescope.actions.state'
+
+      telescope.find_files {
+        prompt_title = 'Select Directory for New File',
+        cwd = vim.fn.getcwd(),
+        find_command = { 'fd', '--type', 'd', '--hidden', '--exclude', '.git' },
+        attach_mappings = function(prompt_bufnr, map)
+          actions.select_default:replace(function()
+            local selection = action_state.get_selected_entry()
+            actions.close(prompt_bufnr)
+            if selection then
+              local selected_dir = selection.path or selection.value
+              dotnet.createfile(selected_dir)
+            else
+              -- If no selection, use current directory
+              dotnet.createfile(vim.fn.getcwd())
+            end
+          end)
+          return true
+        end,
+      }
+    end, { desc = 'Create a new file' })
+
+    vim.keymap.set('n', '<leader>tt', function()
+      dotnet.testrunner()
+    end, { desc = 'Toggle test runner' })
+
+    vim.keymap.set('n', '<leader>tr', function()
+      dotnet.test()
+    end, { desc = 'Run test' })
   end,
 }

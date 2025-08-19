@@ -34,6 +34,27 @@ return {
       auto_approve_tool_permissions = true,
       auto_apply_diff_after_generation = true,
     },
+    shortcuts = {
+      {
+        name = 'refactor',
+        description = 'Refactor code with best practices',
+        details = 'Automatically refactor code to improve readability, maintainability, and follow best practices while preserving functionality',
+        prompt = 'Please refactor this code following best practices, improving readability and maintainability while preserving functionality.',
+      },
+      {
+        name = 'test',
+        description = 'Generate unit tests',
+        details = 'Create comprehensive unit tests covering edge cases, error scenarios, and various input conditions',
+        prompt = 'Please generate comprehensive unit tests for this code, covering edge cases and error scenarios.',
+      },
+      -- Add more custom shortcuts...
+      {
+        name = 'review',
+        description = 'Review current changes',
+        details = 'Review the current changes in the file, providing feedback on code quality, style, and potential improvements',
+        prompt = 'Please review the current changes in this file, providing feedback on code quality, style, and potential improvements.',
+      },
+    },
   },
   dependencies = {
     'nvim-lua/plenary.nvim',
