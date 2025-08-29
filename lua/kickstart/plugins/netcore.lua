@@ -28,7 +28,7 @@ M.register_net_dap = function()
     if debug_dll ~= nil then
       return debug_dll
     end
-    local dll = dotnet.get_debug_dll()
+    local dll = dotnet.get_debug_dll(true)
     debug_dll = dll
     return dll
   end
@@ -71,9 +71,13 @@ M.register_net_dap = function()
     debug_dll = nil
   end
 
+  -- Find netcoredb from netcoredbg-macOS-arm64.nvim plugin direcotry under "netcoredbg/netcoredbg"
+  local netcoredbg_path = vim.fn.stdpath 'data' .. '/lazy/netcoredbg-macOS-arm64.nvim/netcoredbg/netcoredbg'
+  -- print the path for debugging
+  print('Netcoredbg path: ' .. netcoredbg_path)
   dap.adapters.coreclr = {
     type = 'executable',
-    command = 'netcoredbg',
+    command = netcoredbg_path,
     args = { '--interpreter=vscode' },
   }
 end

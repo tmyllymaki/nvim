@@ -30,6 +30,7 @@ return {
       provider = 'searxng', -- tavily, serpapi, google, kagi, brave, or searxng
     },
     behaviour = {
+      auto_suggestions = false, -- Experimental stage
       enable_cursor_planning_mode = true,
       auto_approve_tool_permissions = true,
       auto_apply_diff_after_generation = true,

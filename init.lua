@@ -437,6 +437,11 @@ require('lazy').setup({
           mappings = {
             i = {
               ['<C-q>'] = actions.smart_send_to_qflist + actions.open_qflist,
+              ['<C-d>'] = actions.delete_buffer,
+            },
+            n = {
+              ['<C-d>'] = actions.delete_buffer,
+              ['dd'] = actions.delete_buffer,
             },
           },
         },
@@ -465,7 +470,7 @@ require('lazy').setup({
         }
       end, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
@@ -610,6 +615,9 @@ require('lazy').setup({
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
+
+          map('<C-s>', vim.lsp.buf.signature_help, 'Signature help')
+          map('<C-h>', vim.lsp.buf.hover, 'Signature hover')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -1112,10 +1120,10 @@ require('lazy').setup({
           -- Use if you want more granular movements
           -- Make it even more gradual by adding multiple queries and regex.
           goto_next = {
-            [']d'] = '@conditional.outer',
+            -- [']d'] = '@conditional.outer',
           },
           goto_previous = {
-            ['[d'] = '@conditional.outer',
+            -- ['[d'] = '@conditional.outer',
           },
         },
         lsp_interop = {
@@ -1146,7 +1154,6 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
@@ -1164,6 +1171,7 @@ require('lazy').setup({
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
   -- you can continue same window with `<space>sr` which resumes last telescope search
+  require 'kickstart.plugins.debug',
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -1248,4 +1256,22 @@ vim.api.nvim_create_user_command('FormatEnable', function()
   vim.g.disable_autoformat = false
 end, {
   desc = 'Re-enable autoformat-on-save',
+})
+
+vim.opt.foldenable = false
+vim.opt.foldlevel = 99
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+  callback = function()
+    -- check if treesitter has parser
+    if require('nvim-treesitter.parsers').has_parser() then
+      -- use treesitter folding
+      vim.opt.foldmethod = 'expr'
+      -- vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+      vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+      -- vim.opt.foldtext = 'v:lua.vim.treesitter.foldtext()'
+    else
+      -- use alternative foldmethod
+      vim.opt.foldmethod = 'syntax'
+    end
+  end,
 })

@@ -5,122 +5,39 @@
 
 return {
   {
-    'github/copilot.vim',
-    enabled = true,
-  },
-  require 'custom.lsp.nvim-dap',
-  {
-    'Cliffback/netcoredbg-macOS-arm64.nvim',
-    dependencies = { 'mfussenegger/nvim-dap' },
-  },
-  {
-    'GustavEikaas/easy-dotnet.nvim',
-    -- 'nvim-telescope/telescope.nvim' or 'ibhagwan/fzf-lua'
-    -- are highly recommended for a better experience
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    -- config = true,
     config = function()
-      local function get_secret_path(secret_guid)
-        local home_dir = vim.fn.expand '~'
-        local secret_path = home_dir .. '/.microsoft/usersecrets/' .. secret_guid .. '/secrets.json'
-        return secret_path
-      end
-
-      local dotnet = require 'easy-dotnet'
-      -- Options are not required
-      dotnet.setup {
-        --Optional function to return the path for the dotnet sdk (e.g C:/ProgramFiles/dotnet/sdk/8.0.0)
-        -- easy-dotnet will resolve the path automatically if this argument is omitted, for a performance improvement you can add a function that returns a hardcoded string
-        -- You should define this function to return a hardcoded path for a performance improvement 🚀
-        ---@type TestRunnerOptions
-        test_runner = {
-          ---@type "split" | "float" | "buf"
-          viewmode = 'float',
-          enable_buffer_test_execution = true, --Experimental, run tests directly from buffer
-          noBuild = true,
-          noRestore = true,
-          icons = {
-            passed = '',
-            skipped = '',
-            failed = '',
-            success = '',
-            reload = '',
-            test = '',
-            sln = '󰘐',
-            project = '󰘐',
-            dir = '',
-            package = '',
-          },
-          mappings = {
-            run_test_from_buffer = { lhs = '<leader>r', desc = 'run test from buffer' },
-            filter_failed_tests = { lhs = '<leader>fe', desc = 'filter failed tests' },
-            debug_test = { lhs = '<leader>d', desc = 'debug test' },
-            debug_test_from_buffer = { lhs = '<leader>D', desc = 'debug test from buffer' },
-            go_to_file = { lhs = 'g', desc = 'got to file' },
-            run_all = { lhs = '<leader>R', desc = 'run all tests' },
-            run = { lhs = '<leader>r', desc = 'run test' },
-            peek_stacktrace = { lhs = '<leader>p', desc = 'peek stacktrace of failed test' },
-            expand = { lhs = 'o', desc = 'expand' },
-            expand_node = { lhs = 'E', desc = 'expand node' },
-            expand_all = { lhs = '-', desc = 'expand all' },
-            collapse_all = { lhs = 'W', desc = 'collapse all' },
-            close = { lhs = 'q', desc = 'close testrunner' },
-            refresh_testrunner = { lhs = '<C-r>', desc = 'refresh testrunner' },
-          },
-          --- Optional table of extra args e.g "--blame crash"
-          additional_args = {},
-        },
-        ---@param action "test" | "restore" | "build" | "run"
-        terminal = function(path, action, args)
-          local commands = {
-            run = function()
-              return string.format('dotnet run --project %s %s', path, args)
-            end,
-            test = function()
-              return string.format('dotnet test %s %s', path, args)
-            end,
-            restore = function()
-              return string.format('dotnet restore %s %s', path, args)
-            end,
-            build = function()
-              return string.format('dotnet build %s %s', path, args)
-            end,
-          }
-
-          local command = commands[action]() .. '\r'
-          vim.cmd 'vsplit'
-          vim.cmd('term ' .. command)
-        end,
-        secrets = {
-          path = get_secret_path,
-        },
-        csproj_mappings = true,
-        fsproj_mappings = true,
-        auto_bootstrap_namespace = {
-          --block_scoped, file_scoped
-          type = 'block_scoped',
+      require('copilot').setup {
+        suggestion = {
           enabled = true,
+          auto_trigger = true,
+          hide_during_completion = true,
+          debounce = 75,
+          trigger_on_accept = true,
+          keymap = {
+            accept = '<M-l>',
+            accept_word = false,
+            accept_line = false,
+            next = '<M-]>',
+            prev = '<M-[>',
+            dismiss = '<C-]>',
+          },
         },
-        -- choose which picker to use with the plugin
-        -- possible values are "telescope" | "fzf" | "basic"
-        picker = 'telescope',
+        filetypes = {
+          yaml = true,
+          markdown = false,
+          help = false,
+          gitcommit = false,
+          gitrebase = false,
+          hgcommit = false,
+          svn = false,
+          cvs = false,
+          ['.'] = false,
+        },
       }
-
-      -- Example command
-      vim.api.nvim_create_user_command('Secrets', function()
-        dotnet.secrets()
-      end, {})
-
-      vim.keymap.set('n', '<leader>T', function()
-        vim.cmd 'Dotnet testrunner'
-      end)
-
-      vim.keymap.set('n', '<C-p>', function()
-        dotnet.run_project()
-      end)
-
-      vim.keymap.set('n', '<C-b>', function()
-        dotnet.build_default_quickfix()
-      end)
     end,
   },
   {

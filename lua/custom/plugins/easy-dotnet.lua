@@ -61,6 +61,7 @@ return {
       },
       ---@param action "test" | "restore" | "build" | "run"
       terminal = function(path, action, args)
+        args = args or ''
         local commands = {
           run = function()
             return string.format('dotnet run --project %s %s', path, args)
@@ -78,10 +79,12 @@ return {
             return string.format('dotnet watch --project %s %s', path, args)
           end,
         }
+        local command = commands[action]()
+        if require('easy-dotnet.extensions').isWindows() == true then
+          command = command .. '\r'
+        end
 
-        local command = commands[action]() .. '\r'
-        vim.cmd 'vsplit'
-        vim.cmd('term ' .. command)
+        require('toggleterm').exec(command, nil, nil, nil, 'float')
       end,
       secrets = {
         path = get_secret_path,
@@ -92,9 +95,22 @@ return {
         --block_scoped, file_scoped
         type = 'block_scoped',
         enabled = true,
+        use_clipboard_json = {
+          behavior = 'prompt', --'auto' | 'prompt' | 'never',
+          register = '+', -- which register to check
+        },
       },
       picker = 'telescope',
       background_scanning = true,
+      notifications = {
+        --Set this to false if you have configured lualine to avoid double logging
+        handler = false,
+      },
+      debugger = {
+        mappings = {
+          open_variable_viewer = { lhs = 'T', desc = 'open variable viewer' },
+        },
+      },
     }
 
     -- Example command

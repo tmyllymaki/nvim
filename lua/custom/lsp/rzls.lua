@@ -3,7 +3,7 @@ return {
   ft = { 'cs', 'razor' },
   dependencies = {
     {
-      'williamboman/mason.nvim',
+      'mason-org/mason.nvim',
       opts = {
         registries = {
           'github:mason-org/mason-registry',
@@ -20,8 +20,6 @@ return {
     broad_search = true,
   },
   config = function()
-    local mason_registry = require 'mason-registry'
-
     local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
     local cmd = {
       'roslyn',
