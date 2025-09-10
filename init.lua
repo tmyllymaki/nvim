@@ -168,6 +168,10 @@ vim.opt.confirm = true
 vim.g.matchparen_timeout = 2
 vim.g.matchparen_insert_timeout = 2
 
+-- Disable automatic comment insertion on newline
+vim.cmd 'autocmd BufEnter * set formatoptions-=cro'
+vim.cmd 'autocmd BufEnter * setlocal formatoptions-=cro'
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
