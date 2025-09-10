@@ -8,8 +8,8 @@ return {
     -- refer to `:h file-pattern` for more examples
     'BufReadPre '
       .. vim.fn.expand '~'
-      .. '/Library/Mobile Documents/iCloud~md~obsidian/Documents/*.md',
-    'BufNewFile ' .. vim.fn.expand '~' .. '/Library/Mobile Documents/iCloud~md~obsidian/Documents/*.md',
+      .. '/projects/Obsidian/Work/*.md',
+    'BufNewFile ' .. vim.fn.expand '~' .. '/projects/Obsidian/Work/*.md',
   },
   -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
   -- event = {
@@ -25,8 +25,8 @@ return {
     legacy_commands = false,
     workspaces = {
       {
-        name = 'personal',
-        path = '/Users/tm/Library/Mobile Documents/iCloud~md~obsidian/Documents',
+        name = 'Work',
+        path = '/Users/timomyllymaki/projects/Obsidian/Work',
       },
     },
     -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
