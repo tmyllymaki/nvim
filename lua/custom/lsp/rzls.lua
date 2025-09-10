@@ -18,6 +18,7 @@ return {
   },
   opts = {
     broad_search = true,
+    filewatching = 'roslyn',
   },
   config = function()
     local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
