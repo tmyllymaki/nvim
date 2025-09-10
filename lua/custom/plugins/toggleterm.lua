@@ -2,11 +2,14 @@ return {
   'akinsho/toggleterm.nvim',
   config = function()
     require('toggleterm').setup()
-    vim.keymap.set({ 'n', 't' }, '<A-i>', function()
+    vim.keymap.set({ 'n', 't' }, "<C-'>", function()
       require('toggleterm').toggle(1, nil, nil, 'float')
     end, { noremap = true, silent = true })
-    vim.keymap.set({ 'n', 't' }, '<A-h>', function()
+    vim.keymap.set({ 'n', 't' }, '<Space>!', function()
       require('toggleterm').toggle(2, nil, nil, 'horizontal')
+    end, { noremap = true, silent = true })
+    vim.keymap.set({ 'n', 't' }, '<C-ö>', function()
+      require('toggleterm').toggle_all()
     end, { noremap = true, silent = true })
 
     function _G.set_terminal_keymaps()
@@ -16,7 +19,7 @@ return {
       vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
       vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
       vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
-      vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
+      -- vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
     end
 
     -- if you only want these mappings for toggle term use term://*toggleterm#* instead
