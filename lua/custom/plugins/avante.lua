@@ -19,8 +19,7 @@ return {
     -- add any opts here
     -- for example
     provider = 'copilot',
-    cursor_applying_provider = 'copilot',
-    auto_suggestions_provider = 'copilot',
+    auto_suggestions_provider = nil,
     providers = {
       copilot = {
         model = 'gpt-4.1-2025-04-14',
