@@ -860,6 +860,7 @@ require('lazy').setup({
     dependencies = {
       'Kaiser-Yang/blink-cmp-avante',
       'folke/lazydev.nvim',
+      { 'L3MON4D3/LuaSnip', version = 'v2.*' },
     },
     --- @module 'blink.cmp'
     --- @type blink.cmp.Config
@@ -877,6 +878,8 @@ require('lazy').setup({
         -- ['<Down>'] = { 'select_next', 'fallback' },
         ['<C-p>'] = { 'select_prev', 'fallback' },
         ['<C-n>'] = { 'select_next', 'fallback' },
+        ['<C-l>'] = { 'snippet_forward', 'fallback' },
+        ['<C-h>'] = { 'snippet_backward', 'fallback' },
         -- ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
         -- ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
         -- ['<C-k>'] = { 'show_signature', 'hide_signature', 'fallback' },
@@ -898,7 +901,7 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'avante', 'lsp', 'easy-dotnet', 'path', 'lazydev' },
+        default = { 'avante', 'snippets', 'lsp', 'easy-dotnet', 'path', 'lazydev', 'buffer' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           copilot = { module = 'blink-cmp-copilot', score_offset = 100 },
@@ -922,6 +925,7 @@ require('lazy').setup({
         },
       },
 
+      snippets = { preset = 'luasnip' },
       -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
       -- which automatically downloads a prebuilt binary when enabled.
       --
@@ -1300,3 +1304,8 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
     end
   end,
 })
+
+-- Load snippets --------------------------------------------------------------
+for _, path in ipairs(vim.api.nvim_get_runtime_file('lua/custom/snippets/*.lua', true)) do
+  loadfile(path)()
+end
