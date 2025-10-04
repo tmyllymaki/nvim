@@ -539,6 +539,14 @@ require('lazy').setup({
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
     },
+    opts = {
+      servers = {
+        sourcekit = {
+          cmd = { 'xcrun', 'sourcekit-lsp' },
+          filetypes = { 'swift', 'objective-c', 'objective-cpp' },
+        },
+      },
+    },
     config = function()
       -- Brief aside: **What is LSP?**
       --
@@ -784,6 +792,13 @@ require('lazy').setup({
           end,
         },
       }
+
+      local lspconfig = require 'lspconfig'
+      -- configure Swift serve here since it is not installed via Mason
+      lspconfig.sourcekit.setup {
+        capabilities = capabilities,
+        cmd = vim.trim(vim.fn.system 'xcrun -f sourcekit-lsp'),
+      }
     end,
   },
 
@@ -834,6 +849,8 @@ require('lazy').setup({
         markdown = { 'prettierd', 'prettier', stop_after_first = true },
         yaml = { 'yamlfix' },
         cs = { 'csharpier', lsp_format = 'fallback' },
+        cs = { 'csharpier' },
+        swift = { 'swiftformat' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
