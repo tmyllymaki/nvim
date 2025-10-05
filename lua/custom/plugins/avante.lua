@@ -18,11 +18,21 @@ return {
   opts = {
     -- add any opts here
     -- for example
-    provider = 'copilot',
+    -- provider = 'copilot',
+    provider = 'gemini-cli',
     auto_suggestions_provider = nil,
     providers = {
       copilot = {
         model = 'gpt-4.1-2025-04-14',
+      },
+    },
+    acp_providers = {
+      ['gemini-cli'] = {
+        command = 'gemini',
+        args = { '--experimental-acp' },
+        env = {
+          NODE_NO_WARNINGS = '1',
+        },
       },
     },
     web_search_engine = {

@@ -21,55 +21,51 @@ end
 
 M.register_net_dap = function()
   local dap = require 'dap'
-  local dotnet = require 'easy-dotnet'
-  local debug_dll = nil
+  local debug = require 'easy-dotnet.debugger'
+  local polyfills = require 'easy-dotnet.polyfills'
+  local sln_parse = require 'easy-dotnet.parsers.sln-parse'
 
-  local function ensure_dll()
-    if debug_dll ~= nil then
-      return debug_dll
+  coroutine.resume(coroutine.create(function()
+    local sln_file = sln_parse.find_solution_file()
+    local cs_configs = {}
+
+    if sln_file ~= nil then
+      local projects = sln_parse.get_projects_and_frameworks_flattened_from_sln(sln_file, function(project)
+        return project.runnable
+      end)
+
+      for _, project in pairs(projects) do
+        local project_dll = project.get_dll_path()
+        local project_profiles = debug.get_launch_profiles(vim.fs.dirname(project.path))
+
+        if project_profiles ~= nil then
+          local profile_names = polyfills.tbl_keys(project_profiles)
+          for _, profile_name in pairs(profile_names) do
+            local config_cs = {
+              type = 'coreclr',
+              name = project.name .. ' - ' .. profile_name,
+              request = 'launch',
+              env = function()
+                local project_profile = project_profiles[profile_name]
+                project_profile.environmentVariables['ASPNETCORE_URLS'] = project_profile.applicationUrl
+                return project_profile.environmentVariables
+              end,
+              program = function()
+                local co = coroutine.running()
+                rebuild_project(co, project.path)
+                return project_dll
+              end,
+              cwd = vim.fs.dirname(project.path),
+            }
+
+            table.insert(cs_configs, config_cs)
+          end
+        end
+      end
     end
-    local dll = dotnet.get_debug_dll(true)
-    debug_dll = dll
-    return dll
-  end
 
-  for _, value in ipairs { 'cs', 'fsharp' } do
-    dap.configurations[value] = {
-      {
-        type = 'coreclr',
-        name = 'Program',
-        request = 'launch',
-        env = function()
-          local dll = ensure_dll()
-          local vars = dotnet.get_environment_variables(dll.project_name, dll.relative_project_path)
-          return vars or nil
-        end,
-        program = function()
-          local dll = ensure_dll()
-          local co = coroutine.running()
-          rebuild_project(co, dll.project_path)
-          return dll.relative_dll_path
-        end,
-        cwd = function()
-          local dll = ensure_dll()
-          return dll.relative_project_path
-        end,
-      },
-      {
-        type = 'coreclr',
-        name = 'Test',
-        request = 'attach',
-        processId = function()
-          local res = require('easy-dotnet').experimental.start_debugging_test_project()
-          return res.process_id
-        end,
-      },
-    }
-  end
-
-  dap.listeners.before['event_terminated']['easy-dotnet'] = function()
-    debug_dll = nil
-  end
+    dap.configurations.cs = cs_configs
+  end))
 
   -- Find netcoredb from netcoredbg-macOS-arm64.nvim plugin direcotry under "netcoredbg/netcoredbg"
   local netcoredbg_path = vim.fn.stdpath 'data' .. '/lazy/netcoredbg-macOS-arm64.nvim/netcoredbg/netcoredbg'

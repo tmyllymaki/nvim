@@ -13,8 +13,14 @@ return {
     end
 
     local dotnet = require 'easy-dotnet'
+    local netcoredbg_path = vim.fn.stdpath 'data' .. '/lazy/netcoredbg-macOS-arm64.nvim/netcoredbg/netcoredbg'
     -- Options are not required
     dotnet.setup {
+      lsp = {
+        enabled = false, -- We've set this up manually
+        roslynator_enabled = false, -- Automatically enable roslynator analyzer
+        analyzer_assemblies = {}, -- Any additional roslyn analyzers you might use like SonarAnalyzer.CSharp
+      },
       get_sdk_path = function()
         return '/opt/homebrew/bin/dotnet'
       end,
@@ -107,9 +113,15 @@ return {
         handler = false,
       },
       debugger = {
+        bin_path = netcoredbg_path,
+        auto_register_dap = true,
         mappings = {
           open_variable_viewer = { lhs = 'T', desc = 'open variable viewer' },
         },
+      },
+      diagnostics = {
+        default_severity = 'error',
+        setqflist = false,
       },
     }
 
