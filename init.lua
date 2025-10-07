@@ -1,3 +1,4 @@
+--[[
 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -893,7 +894,12 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'saghen/blink.compat',
+    version = '2.*',
+    lazy = true,
+    opts = {},
+  },
   { -- Autocompletion
     'saghen/blink.cmp',
     event = 'VimEnter',
@@ -901,11 +907,23 @@ require('lazy').setup({
     dependencies = {
       'Kaiser-Yang/blink-cmp-avante',
       'folke/lazydev.nvim',
+      {
+        'MattiasMTS/cmp-dbee',
+        -- branch = 'ms/v2',
+        dependencies = {
+          { 'kndndrj/nvim-dbee' },
+        },
+        ft = 'sql', -- optional but good to have
+        opts = {}, -- needed
+      },
       { 'L3MON4D3/LuaSnip', version = 'v2.*' },
     },
     --- @module 'blink.cmp'
     --- @type blink.cmp.Config
     opts = {
+      enabled = function()
+        return not vim.list_contains({ 'DressingInput' }, vim.bo.filetype) and vim.bo.buftype ~= 'prompt' and vim.b.completion ~= false
+      end,
       keymap = {
         -- Use custom keymap for IDE-like behavior
         preset = 'enter',
@@ -960,9 +978,11 @@ require('lazy').setup({
             score_offset = 10000,
             async = true,
           },
+          dbee = { name = 'cmp-dbee', module = 'blink.compat.source' },
         },
         per_filetype = {
           codecompanion = { 'codecompanion' },
+          sql = { 'dbee' },
         },
       },
 
@@ -980,7 +1000,6 @@ require('lazy').setup({
       signature = { enabled = true },
     },
   },
-
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
