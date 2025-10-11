@@ -765,6 +765,7 @@ require('lazy').setup({
         -- This table contains config for all language servers that are *not* installed via Mason.
         -- Structure is identical to the mason table from above.
         others = {
+          gleam = {},
           -- dartls = {},
           nixd = {
             nixpkgs = {
