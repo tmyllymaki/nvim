@@ -742,6 +742,7 @@ require('lazy').setup({
         --
         --  Feel free to add/remove any LSPs here that you want to install via Mason. They will automatically be installed and setup.
         mason = {
+          tailwindcss = {},
           pyright = {},
           rust_analyzer = {},
           -- But for many setups, the LSP (`ts_ls`) will work just fine
@@ -774,6 +775,10 @@ require('lazy').setup({
             formatting = {
               command = { 'alejandra' },
             },
+          },
+          sourcekit = {
+            cmd = { vim.trim(vim.fn.system 'xcrun -f sourcekit-lsp') },
+            filetypes = { 'swift', 'objective-c', 'objective-cpp' },
           },
         },
       }
@@ -818,13 +823,6 @@ require('lazy').setup({
       if not vim.tbl_isempty(servers.others) then
         vim.lsp.enable(vim.tbl_keys(servers.others))
       end
-
-      local lspconfig = require 'lspconfig'
-      -- configure Swift serve here since it is not installed via Mason
-      lspconfig.sourcekit.setup {
-        capabilities = capabilities,
-        cmd = vim.trim(vim.fn.system 'xcrun -f sourcekit-lsp'),
-      }
     end,
   },
 
@@ -1055,21 +1053,27 @@ require('lazy').setup({
         local system_theme = get_system_theme()
         if system_theme == 'dark' then
           -- vim.cmd.colorscheme 'modus_vivendi'
-          vim.cmd.colorscheme 'tokyonight'
+          -- vim.cmd.colorscheme 'alabaster'
         else
-          vim.cmd.colorscheme 'tokyonight'
+          -- vim.cmd.colorscheme 'modus_operandi'
+          -- vim.cmd.colorscheme 'alabaster'
         end
       end
 
       -- Set initial theme
-      set_theme_from_system()
+      --set_theme_from_system()
+
+      -- vim.cmd.colorscheme 'vague'
+      -- vim.cmd.colorscheme 'vesper'
+      vim.o.background = 'dark' -- or "light" for light mode
+      vim.cmd [[colorscheme gruvbox]]
 
       -- Create autocommand to check system theme periodically
-      vim.api.nvim_create_autocmd('FocusGained', {
-        group = vim.api.nvim_create_augroup('SystemThemeSync', { clear = true }),
-        callback = set_theme_from_system,
-        desc = 'Sync colorscheme with system theme when gaining focus',
-      })
+      -- vim.api.nvim_create_autocmd('FocusGained', {
+      --   group = vim.api.nvim_create_augroup('SystemThemeSync', { clear = true }),
+      --   callback = set_theme_from_system,
+      --   desc = 'Sync colorscheme with system theme when gaining focus',
+      -- })
     end,
   },
 
@@ -1100,6 +1104,12 @@ require('lazy').setup({
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
+
+      local job_indicator = { require('easy-dotnet.ui-modules.jobs').lualine }
+      statusline.section_modes = function()
+        local mode = statusline.section_base_modes()
+        return mode .. ' ' .. job_indicator()
+      end
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for

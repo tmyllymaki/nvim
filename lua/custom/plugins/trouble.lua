@@ -5,13 +5,16 @@ return {
   dependencies = { 'nvim-tree/nvim-web-devicons' },
   enabled = not vim.g.is_perf,
   cmd = 'Trouble',
-  config = function()
-    require('trouble').setup {
-      auto_close = true,
-      auto_preview = true,
-      auto_jump = true,
-    }
-  end,
+  opts = {
+    auto_close = true,
+    auto_preview = true,
+    auto_jump = true,
+    win = {
+      wo = {
+        wrap = true,
+      },
+    },
+  },
   keys = {
     {
       '<leader>xx',

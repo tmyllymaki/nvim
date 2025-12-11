@@ -193,7 +193,7 @@ return {
     vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, {})
     vim.keymap.set('n', '<F2>', require('dap.ui.widgets').hover, {})
 
-    require('kickstart.plugins.netcore').register_net_dap()
+    -- require('kickstart.plugins.netcore').register_net_dap()
 
     vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = '', linehl = 'DapBreakpoint', numhl = '' })
     vim.fn.sign_define('DapStopped', { text = '󰳟', texthl = '', linehl = 'DapStopped', numhl = '' })

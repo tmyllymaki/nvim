@@ -4,9 +4,19 @@ return {
     'ravitemer/codecompanion-history.nvim',
     'nvim-lua/plenary.nvim',
     'nvim-treesitter/nvim-treesitter',
+    -- {
+    --   'MeanderingProgrammer/render-markdown.nvim',
+    --   ft = { 'markdown', 'codecompanion' },
+    -- },
     {
-      'MeanderingProgrammer/render-markdown.nvim',
-      ft = { 'markdown', 'codecompanion' },
+      'OXY2DEV/markview.nvim',
+      lazy = false,
+      opts = {
+        preview = {
+          filetypes = { 'markdown', 'codecompanion' },
+          ignore_buftypes = {},
+        },
+      },
     },
     {
       'HakonHarnes/img-clip.nvim',
@@ -118,16 +128,27 @@ return {
         },
       },
     },
+    adapters = {
+      acp = {
+        claude_code = function()
+          return require('codecompanion.adapters').extend('claude_code', {
+            env = {
+              CLAUDE_CODE_OAUTH_TOKEN = 'cmd:op read "op://Employee/Claude Code Token/password" --no-newline',
+            },
+          })
+        end,
+      },
+    },
     strategies = {
       -- Change the default chat adapter
       chat = {
-        adapter = 'copilot',
+        adapter = 'claude_code',
       },
       inline = {
         adapter = 'copilot',
       },
       cmd = {
-        adapter = 'copilot',
+        adapter = 'claude_code',
       },
     },
     opts = {
