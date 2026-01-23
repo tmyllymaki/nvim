@@ -160,7 +160,10 @@ return {
     local dap = require 'dap'
     dap.set_log_level 'TRACE'
     local dapui = require 'dapui'
-    require('easy-dotnet.netcoredbg').register_dap_variables_viewer()
+    -- Only register if easy-dotnet is loaded
+    if pcall(require, 'easy-dotnet') then
+      require('easy-dotnet.netcoredbg').register_dap_variables_viewer()
+    end
 
     dap.listeners.before.attach.dapui_config = function()
       dapui.open()

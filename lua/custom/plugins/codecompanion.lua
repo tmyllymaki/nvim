@@ -1,5 +1,6 @@
 return {
   'olimorris/codecompanion.nvim',
+  enabled = false,
   dependencies = {
     'ravitemer/codecompanion-history.nvim',
     'nvim-lua/plenary.nvim',
@@ -133,20 +134,16 @@ return {
         claude_code = function()
           return require('codecompanion.adapters').extend('claude_code', {
             env = {
-              CLAUDE_CODE_OAUTH_TOKEN = 'cmd:op read "op://Employee/Claude Code Token/password" --no-newline',
+              CLAUDE_CODE_OAUTH_TOKEN = 'cmd:op read "op://Employee/Claude Code Token/password" --account YP634KRPORGYFHHJHWYY7KBMWM --no-newline',
             },
           })
         end,
       },
     },
-    strategies = {
+    interactions = {
       -- Change the default chat adapter
-      chat = {
-        adapter = 'claude_code',
-      },
-      inline = {
-        adapter = 'copilot',
-      },
+      chat = { adapter = 'claude_code' },
+      inline = { adapter = 'claude_code' },
       cmd = {
         adapter = 'claude_code',
       },

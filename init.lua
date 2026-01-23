@@ -678,6 +678,18 @@ require('lazy').setup({
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
           end
+
+          -- Toggle codelens
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_codeLens, event.buf) then
+            map('<leader>tl', function()
+              vim.g.codelens_enabled = not vim.g.codelens_enabled
+              if vim.g.codelens_enabled then
+                vim.lsp.codelens.refresh { bufnr = event.buf }
+              else
+                vim.lsp.codelens.clear(nil, event.buf)
+              end
+            end, '[T]oggle Code[L]ens')
+          end
         end,
       })
 
@@ -745,20 +757,17 @@ require('lazy').setup({
           tailwindcss = {},
           pyright = {},
           rust_analyzer = {},
-          -- But for many setups, the LSP (`ts_ls`) will work just fine
-          ts_ls = {},
-          --
-          lua_ls = {
-            -- cmd = { ... },
-            -- filetypes = { ... },
-            -- capabilities = {},
+          powershell_es = {
             settings = {
-              Lua = {
-                completion = {
-                  callSnippet = 'Replace',
+              powershell = {
+                codeFormatting = {
+                  -- 'OTBS' keeps open braces on the same line
+                  preset = 'Stroustrup',
+                  -- -- This prevents the formatter from expanding single-line loops/ifs
+                  -- ignoreOneLineBlock = true,
+                  -- -- Optional: Fix pipeline indentation
+                  -- pipelineIndentationStyle = 'IncreaseIndentationForFirstPipeline',
                 },
-                -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                -- diagnostics = { disable = { 'missing-fields' } },
               },
             },
           },
@@ -854,7 +863,7 @@ require('lazy').setup({
           return nil
         else
           return {
-            timeout_ms = 500,
+            timeout_ms = 3000,
             lsp_format = 'fallback',
           }
         end
@@ -959,7 +968,7 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'avante', 'snippets', 'lsp', 'easy-dotnet', 'path', 'lazydev', 'buffer' },
+        default = { 'avante', 'snippets', 'lsp', 'path', 'lazydev', 'buffer' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           copilot = { module = 'blink-cmp-copilot', score_offset = 100 },
@@ -972,7 +981,6 @@ require('lazy').setup({
           },
           ['easy-dotnet'] = {
             name = 'easy-dotnet',
-            enabled = true,
             module = 'easy-dotnet.completion.blink',
             score_offset = 10000,
             async = true,
@@ -982,6 +990,8 @@ require('lazy').setup({
         per_filetype = {
           codecompanion = { 'codecompanion' },
           sql = { 'dbee' },
+          csproj = { 'easy-dotnet', 'avante', 'snippets', 'lsp', 'path', 'buffer' },
+          fsproj = { 'easy-dotnet', 'avante', 'snippets', 'lsp', 'path', 'buffer' },
         },
       },
 
@@ -1052,28 +1062,28 @@ require('lazy').setup({
       local function set_theme_from_system()
         local system_theme = get_system_theme()
         if system_theme == 'dark' then
-          -- vim.cmd.colorscheme 'modus_vivendi'
+          vim.cmd.colorscheme 'modus_vivendi'
           -- vim.cmd.colorscheme 'alabaster'
         else
-          -- vim.cmd.colorscheme 'modus_operandi'
+          vim.cmd.colorscheme 'modus_operandi'
           -- vim.cmd.colorscheme 'alabaster'
         end
       end
 
       -- Set initial theme
-      --set_theme_from_system()
+      set_theme_from_system()
 
       -- vim.cmd.colorscheme 'vague'
       -- vim.cmd.colorscheme 'vesper'
-      vim.o.background = 'dark' -- or "light" for light mode
-      vim.cmd [[colorscheme gruvbox]]
+      -- vim.o.background = 'dark' -- or "light" for light mode
+      -- vim.cmd [[colorscheme gruvbox]]
 
       -- Create autocommand to check system theme periodically
-      -- vim.api.nvim_create_autocmd('FocusGained', {
-      --   group = vim.api.nvim_create_augroup('SystemThemeSync', { clear = true }),
-      --   callback = set_theme_from_system,
-      --   desc = 'Sync colorscheme with system theme when gaining focus',
-      -- })
+      vim.api.nvim_create_autocmd('FocusGained', {
+        group = vim.api.nvim_create_augroup('SystemThemeSync', { clear = true }),
+        callback = set_theme_from_system,
+        desc = 'Sync colorscheme with system theme when gaining focus',
+      })
     end,
   },
 
@@ -1105,10 +1115,17 @@ require('lazy').setup({
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
-      local job_indicator = { require('easy-dotnet.ui-modules.jobs').lualine }
+      local job_indicator_fn = function()
+        local ok, jobs = pcall(require, 'easy-dotnet.ui-modules.jobs')
+        if ok then
+          return jobs.lualine()
+        end
+        return ''
+      end
       statusline.section_modes = function()
         local mode = statusline.section_base_modes()
-        return mode .. ' ' .. job_indicator()
+        local indicator = job_indicator_fn()
+        return mode .. (indicator ~= '' and (' ' .. indicator) or '')
       end
 
       -- You can configure sections in the statusline by overriding their
@@ -1293,6 +1310,9 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
+  change_detection = {
+    notify = false,
+  },
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
@@ -1342,6 +1362,15 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
       -- use alternative foldmethod
       vim.opt.foldmethod = 'syntax'
     end
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'ps1',
+  callback = function()
+    vim.opt_local.expandtab = true -- Use spaces, not tabs
+    vim.opt_local.shiftwidth = 4 -- Indent by 4 spaces
+    vim.opt_local.tabstop = 4 -- Tabs look like 4 spaces
   end,
 })
 

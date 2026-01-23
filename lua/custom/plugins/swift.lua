@@ -8,6 +8,14 @@ return {
   -- Enhanced Swift support
   {
     'wojciech-kulik/xcodebuild.nvim',
+    ft = 'swift',
+    cmd = { 'XcodebuildSetup', 'XcodebuildPicker', 'XcodebuildBuild', 'XcodebuildRun' },
+    cond = function()
+      -- Only load if Xcode project files exist
+      return vim.fn.glob('*.xcodeproj') ~= ''
+        or vim.fn.glob('*.xcworkspace') ~= ''
+        or vim.fn.glob('Package.swift') ~= ''
+    end,
     dependencies = {
       'nvim-telescope/telescope.nvim',
       'MunifTanjim/nui.nvim',
