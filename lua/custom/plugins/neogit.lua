@@ -3,6 +3,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'sindrets/diffview.nvim',
+    'esmuellert/codediff.nvim',
     'ibhagwan/fzf-lua',
   },
   config = function()
@@ -191,7 +192,8 @@ return {
         -- The diffview integration enables the diff popup.
         --
         -- Requires you to have `sindrets/diffview.nvim` installed.
-        diffview = true,
+        diffview = false,
+        codediff = true,
 
         -- If enabled, uses fzf-lua for menu selection. If the telescope integration
         -- is also selected then telescope is used instead
@@ -203,6 +205,7 @@ return {
         -- Requires you to have `echasnovski/mini.pick` installed.
         mini_pick = false,
       },
+      diff_viewer = 'codediff',
       sections = {
         -- Reverting/Cherry Picking
         sequencer = {

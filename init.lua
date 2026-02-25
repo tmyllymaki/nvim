@@ -181,6 +181,10 @@ vim.keymap.set({ 'n', 'v' }, '<LocalLeader>aa', '<cmd>CodeCompanionActions<cr>',
 vim.keymap.set({ 'n', 'v' }, '<LocalLeader>at', '<cmd>CodeCompanionChat Toggle<cr>', { noremap = true, silent = true })
 vim.keymap.set('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { noremap = true, silent = true })
 
+-- Center the cursor after jumps
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+
 -- Expand 'cc' into 'CodeCompanion' in the command line
 vim.cmd [[cab cc CodeCompanion]]
 
@@ -915,15 +919,15 @@ require('lazy').setup({
     dependencies = {
       'Kaiser-Yang/blink-cmp-avante',
       'folke/lazydev.nvim',
-      {
-        'MattiasMTS/cmp-dbee',
-        -- branch = 'ms/v2',
-        dependencies = {
-          { 'kndndrj/nvim-dbee' },
-        },
-        ft = 'sql', -- optional but good to have
-        opts = {}, -- needed
-      },
+      -- {
+      --   'MattiasMTS/cmp-dbee',
+      --   -- branch = 'ms/v2',
+      --   dependencies = {
+      --     { 'kndndrj/nvim-dbee' },
+      --   },
+      --   ft = 'sql', -- optional but good to have
+      --   opts = {}, -- needed
+      -- },
       { 'L3MON4D3/LuaSnip', version = 'v2.*' },
     },
     --- @module 'blink.cmp'
@@ -965,6 +969,13 @@ require('lazy').setup({
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
         documentation = { auto_show = true, auto_show_delay_ms = 500 },
+        ghost_text = {
+          enabled = true,
+          show_with_selection = true,
+          show_without_selection = false,
+          show_with_menu = true,
+          show_without_menu = true,
+        },
       },
 
       sources = {
@@ -985,11 +996,13 @@ require('lazy').setup({
             score_offset = 10000,
             async = true,
           },
-          dbee = { name = 'cmp-dbee', module = 'blink.compat.source' },
+          -- dbee = { name = 'cmp-dbee', module = 'blink.compat.source' },
+          dadbod = { name = 'Dadbod', module = 'vim_dadbod_completion.blink' },
         },
         per_filetype = {
           codecompanion = { 'codecompanion' },
-          sql = { 'dbee' },
+          -- sql = { 'dbee' },
+          sql = { 'snippets', 'dadbod', 'buffer' },
           csproj = { 'easy-dotnet', 'avante', 'snippets', 'lsp', 'path', 'buffer' },
           fsproj = { 'easy-dotnet', 'avante', 'snippets', 'lsp', 'path', 'buffer' },
         },
@@ -1003,7 +1016,14 @@ require('lazy').setup({
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'prefer_rust_with_warning' },
+      fuzzy = {
+        implementation = 'prefer_rust_with_warning',
+        frecency = {
+          enabled = true,
+          path = vim.fn.stdpath 'state' .. '/blink/cmp/frecency.dat',
+        },
+        use_proximity = true,
+      },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
@@ -1062,28 +1082,24 @@ require('lazy').setup({
       local function set_theme_from_system()
         local system_theme = get_system_theme()
         if system_theme == 'dark' then
-          vim.cmd.colorscheme 'modus_vivendi'
-          -- vim.cmd.colorscheme 'alabaster'
+          -- vim.cmd.colorscheme 'modus_vivendi'
+          -- vim.cmd.colorscheme 'koda'
+          vim.cmd.colorscheme 'alabaster'
         else
-          vim.cmd.colorscheme 'modus_operandi'
-          -- vim.cmd.colorscheme 'alabaster'
+          -- vim.cmd.colorscheme 'modus_operandi'
+          -- vim.cmd.colorscheme 'koda'
+          vim.cmd.colorscheme 'alabaster'
         end
       end
 
       -- Set initial theme
+      vim.o.background = get_system_theme() -- Set background for themes that use it
       set_theme_from_system()
 
       -- vim.cmd.colorscheme 'vague'
       -- vim.cmd.colorscheme 'vesper'
       -- vim.o.background = 'dark' -- or "light" for light mode
       -- vim.cmd [[colorscheme gruvbox]]
-
-      -- Create autocommand to check system theme periodically
-      vim.api.nvim_create_autocmd('FocusGained', {
-        group = vim.api.nvim_create_augroup('SystemThemeSync', { clear = true }),
-        callback = set_theme_from_system,
-        desc = 'Sync colorscheme with system theme when gaining focus',
-      })
     end,
   },
 
@@ -1377,7 +1393,17 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
-vim.opt.fillchars:append { diff = '╱' }
+-- vim.opt.fillchars:append { diff = '╱' }
+-- Better diff options
+vim.opt.diffopt:append {
+  'linematch:60', -- Better alignment for moved/changed blocks (Nvim 0.9+)
+  'internal',
+  'filler',
+  'closeoff',
+}
+
+-- Visual 'bridge' for empty spaces
+vim.opt.fillchars:append { diff = '░' }
 
 -- Load snippets --------------------------------------------------------------
 for _, path in ipairs(vim.api.nvim_get_runtime_file('lua/custom/snippets/*.lua', true)) do
