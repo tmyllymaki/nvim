@@ -83,6 +83,7 @@ local function setup_toggleterm_provider()
 end
 return {
   'coder/claudecode.nvim',
+  enabled = false, -- Replaced by sidekick.nvim
   dependencies = { 'folke/snacks.nvim' },
   config = true,
   keys = {
@@ -115,7 +116,8 @@ return {
     { '<leader>ad', '<cmd>ClaudeCodeDiffDeny<cr>', desc = 'Deny diff' },
   },
   opts = {
-    terminal_cmd = '/opt/homebrew/bin/claude', -- Point to local installation
+    -- terminal_cmd = '/opt/homebrew/bin/claude', -- Unsandboxed
+    terminal_cmd = 'sandboxed-claude', -- Runs claude inside sandbox-exec profile
     terminal = {
       provider = setup_toggleterm_provider(),
       ---@module "snacks"

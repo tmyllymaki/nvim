@@ -104,6 +104,14 @@ vim.o.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
 
+-- Set conceallevel for markdown (required for obsidian.nvim)
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    vim.opt_local.conceallevel = 2
+  end,
+})
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 
@@ -210,14 +218,8 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 
--- Tab key for accepting Copilot suggestions (IDE-like behavior)
-vim.keymap.set('i', '<Tab>', function()
-  if require('copilot.suggestion').is_visible() then
-    require('copilot.suggestion').accept()
-  else
-    return '<Tab>'
-  end
-end, { desc = 'Accept Copilot suggestion or fallback to Tab', expr = true })
+-- Tab key for Copilot suggestions handled by sidekick.nvim Tab keybinding
+-- (sidekick NES -> copilot suggestion -> normal Tab fallback)
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -367,6 +369,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>n', group = '[N]otes' },
       },
     },
   },
@@ -918,6 +921,7 @@ require('lazy').setup({
     version = '1.*',
     dependencies = {
       'Kaiser-Yang/blink-cmp-avante',
+      'giuxtaposition/blink-cmp-copilot',
       'folke/lazydev.nvim',
       -- {
       --   'MattiasMTS/cmp-dbee',
@@ -979,7 +983,7 @@ require('lazy').setup({
       },
 
       sources = {
-        default = { 'avante', 'snippets', 'lsp', 'path', 'lazydev', 'buffer' },
+        default = { 'copilot', 'avante', 'snippets', 'lsp', 'path', 'lazydev', 'buffer' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
           copilot = { module = 'blink-cmp-copilot', score_offset = 100 },
@@ -1408,4 +1412,9 @@ vim.opt.fillchars:append { diff = '░' }
 -- Load snippets --------------------------------------------------------------
 for _, path in ipairs(vim.api.nvim_get_runtime_file('lua/custom/snippets/*.lua', true)) do
   loadfile(path)()
+end
+
+local ok, custom_dbs = pcall(require, 'db_secrets')
+if ok then
+  vim.g.dbs = custom_dbs
 end

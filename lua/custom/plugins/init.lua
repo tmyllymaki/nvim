@@ -12,19 +12,10 @@ return {
     config = function()
       require('copilot').setup {
         suggestion = {
-          enabled = true,
-          auto_trigger = true,
-          hide_during_completion = true,
-          debounce = 75,
-          trigger_on_accept = true,
-          keymap = {
-            accept = '<M-l>',
-            accept_word = false,
-            accept_line = false,
-            next = '<M-]>',
-            prev = '<M-[>',
-            dismiss = '<C-]>',
-          },
+          enabled = false, -- using blink-cmp-copilot for completion menu + sidekick NES
+        },
+        panel = {
+          enabled = false,
         },
         filetypes = {
           yaml = true,
