@@ -1,5 +1,6 @@
 return {
   'akinsho/toggleterm.nvim',
+  enabled = false, -- replaced by snacks.terminal
   config = function()
     toggle_term = require 'toggleterm'
     toggle_term.setup()

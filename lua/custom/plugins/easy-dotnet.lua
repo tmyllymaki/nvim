@@ -3,7 +3,7 @@ return {
   ft = { 'cs', 'fs', 'fsproj', 'csproj', 'sln', 'slnx' },
   -- 'nvim-telescope/telescope.nvim' or 'ibhagwan/fzf-lua' or 'folke/snacks.nvim'
   -- are highly recommended for a better experience
-  dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+  dependencies = { 'nvim-lua/plenary.nvim', 'folke/snacks.nvim' },
   config = function()
     local function get_secret_path(secret_guid)
       local path = ''
@@ -141,7 +141,7 @@ return {
           register = '+', -- which register to check
         },
       },
-      picker = 'telescope',
+      picker = 'snacks',
       background_scanning = true,
       notifications = {
         --Set this to false if you have configured lualine to avoid double logging
@@ -191,29 +191,18 @@ return {
     end, { desc = 'Open dotnet user-secrets' })
 
     vim.keymap.set('n', '<leader>ma', function()
-      local telescope = require 'telescope.builtin'
-      local actions = require 'telescope.actions'
-      local action_state = require 'telescope.actions.state'
-
-      telescope.find_files {
-        prompt_title = 'Select Directory for New File',
-        cwd = vim.fn.getcwd(),
-        find_command = { 'fd', '--type', 'd', '--hidden', '--exclude', '.git' },
-        attach_mappings = function(prompt_bufnr, map)
-          actions.select_default:replace(function()
-            local selection = action_state.get_selected_entry()
-            actions.close(prompt_bufnr)
-            if selection then
-              local selected_dir = selection.path or selection.value
-              dotnet.createfile(selected_dir)
-            else
-              -- If no selection, use current directory
-              dotnet.createfile(vim.fn.getcwd())
-            end
-          end)
-          return true
+      Snacks.picker.files({
+        title = 'Select Directory for New File',
+        cmd = 'fd --type d --hidden --exclude .git',
+        confirm = function(picker, item)
+          picker:close()
+          if item then
+            dotnet.createfile(item.file or item.text)
+          else
+            dotnet.createfile(vim.fn.getcwd())
+          end
         end,
-      }
+      })
     end, { desc = 'Create a new file' })
 
     vim.keymap.set('n', '<leader>tt', function()

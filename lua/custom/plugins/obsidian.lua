@@ -69,10 +69,13 @@ return {
     {
       '<leader>no',
       function()
-        require('telescope.builtin').grep_string {
+        Snacks.picker.grep {
           cwd = vault_path,
-          search = '- [ ] ',
-          prompt_title = 'Open Tasks',
+          search = '^\\s*- \\[ \\]',
+          regex = true,
+          live = false,
+          layout = 'ivy',
+          title = 'Open Tasks',
         }
       end,
       desc = 'Open tasks',
@@ -81,7 +84,9 @@ return {
       '<leader>nc',
       function()
         vim.ui.input({ prompt = 'Task: ' }, function(input)
-          if not input or input == '' then return end
+          if not input or input == '' then
+            return
+          end
           vim.ui.input({ prompt = 'Due date (YYYY-MM-DD, empty to skip): ' }, function(date)
             local task = '- [ ] ' .. input
             if date and date ~= '' then
