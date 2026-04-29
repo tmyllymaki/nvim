@@ -1,6 +1,6 @@
 return {
   'olimorris/codecompanion.nvim',
-  enabled = false,
+  enabled = true,
   dependencies = {
     'ravitemer/codecompanion-history.nvim',
     'nvim-lua/plenary.nvim',
@@ -142,10 +142,10 @@ return {
     },
     interactions = {
       -- Change the default chat adapter
-      chat = { adapter = 'claude_code' },
-      inline = { adapter = 'claude_code' },
+      chat = { adapter = 'copilot' },
+      inline = { adapter = 'copilot' },
       cmd = {
-        adapter = 'claude_code',
+        adapter = 'copilot',
       },
     },
     opts = {
