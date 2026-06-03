@@ -1,10 +1,9 @@
-return {
-  'ravitemer/mcphub.nvim',
-  dependencies = {
-    'nvim-lua/plenary.nvim',
-  },
-  build = 'npm install -g mcp-hub@latest', -- Installs `mcp-hub` node binary globally
-  config = function()
+-- mcphub.nvim — MCP server hub. Lazy-loaded on :MCPHub.
+-- (`mcp-hub` binary installed via the PackChanged hook; plenary is eager.)
+require('custom.lazy').load {
+  src = 'https://github.com/ravitemer/mcphub.nvim',
+  cmd = 'MCPHub',
+  setup = function()
     require('mcphub').setup()
   end,
 }

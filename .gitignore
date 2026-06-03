@@ -5,4 +5,9 @@ nvim
 
 spell/
 lazy-lock.json
+nvim-pack-lock.json
 lua/db_secrets.lua
+
+# Local reference clone of upstream kickstart.nvim + stray logs
+kickstart.nvim/
+nvim.log

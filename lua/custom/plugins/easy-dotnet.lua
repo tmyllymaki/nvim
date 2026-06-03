@@ -1,20 +1,26 @@
-return {
-  'GustavEikaas/easy-dotnet.nvim',
+-- easy-dotnet.nvim — .NET project/test/debug tooling. Lazy-loaded on .NET files.
+-- (plenary + snacks are loaded eagerly at startup.)
+require('custom.lazy').load {
+  src = 'https://github.com/GustavEikaas/easy-dotnet.nvim',
   ft = { 'cs', 'fs', 'fsproj', 'csproj', 'sln', 'slnx' },
-  -- 'nvim-telescope/telescope.nvim' or 'ibhagwan/fzf-lua' or 'folke/snacks.nvim'
-  -- are highly recommended for a better experience
-  dependencies = { 'nvim-lua/plenary.nvim', 'folke/snacks.nvim' },
-  config = function()
+  setup = function()
     local function get_secret_path(secret_guid)
-      local path = ''
       local home_dir = vim.fn.expand '~'
-      local secret_path = home_dir .. '/.microsoft/usersecrets/' .. secret_guid .. '/secrets.json'
-      path = secret_path
-      return path
+      return home_dir .. '/.microsoft/usersecrets/' .. secret_guid .. '/secrets.json'
+    end
+
+    -- Resolve the netcoredbg binary from whichever plugin dir it lives in
+    -- (vim.pack installs under site/pack/core/opt, not the old lazy/ path).
+    local function resolve_netcoredbg()
+      local found = vim.api.nvim_get_runtime_file('netcoredbg/netcoredbg', false)[1]
+      if found then
+        return found
+      end
+      return vim.fs.joinpath(vim.fn.stdpath 'data', 'site/pack/core/opt/netcoredbg-macOS-arm64.nvim/netcoredbg/netcoredbg')
     end
 
     local dotnet = require 'easy-dotnet'
-    local netcoredbg_path = vim.fn.stdpath 'data' .. '/lazy/netcoredbg-macOS-arm64.nvim/netcoredbg/netcoredbg'
+    local netcoredbg_path = resolve_netcoredbg()
     -- Options are not required
     dotnet.setup {
       lsp = {
@@ -73,16 +79,16 @@ return {
         enable_buffer_test_execution = true, --Experimental, run tests directly from buffer
         noBuild = true,
         icons = {
-          passed = '',
-          skipped = '',
-          failed = '',
-          success = '',
-          reload = '',
-          test = '',
+          passed = '',
+          skipped = '',
+          failed = '',
+          success = '',
+          reload = '',
+          test = '',
           sln = '󰘐',
           project = '󰘐',
-          dir = '',
-          package = '',
+          dir = '',
+          package = '',
         },
         mappings = {
           run_test_from_buffer = { lhs = '<leader>r', desc = 'run test from buffer' },
@@ -180,7 +186,6 @@ return {
       dotnet.secrets()
     end, {})
 
-    -- dotnet.build_default_quickfix()
     vim.keymap.set('n', '<leader>mb', function()
       dotnet.build_default_quickfix()
     end, { desc = 'Build default project with quickfix' })

@@ -1,11 +1,12 @@
-return {
-  'folke/zen-mode.nvim',
-  opts = {
-    -- your configuration comes here
-    -- or leave it empty to use the default settings
-    -- refer to the configuration section below
-    window = {
-      width = 140,
-    },
-  },
+-- zen-mode.nvim — distraction-free editing. Lazy-loaded on :ZenMode.
+require('custom.lazy').load {
+  src = 'https://github.com/folke/zen-mode.nvim',
+  cmd = 'ZenMode',
+  setup = function()
+    require('zen-mode').setup {
+      window = {
+        width = 140,
+      },
+    }
+  end,
 }

@@ -1,15 +1,18 @@
-return {
-  'NeogitOrg/neogit',
-  dependencies = {
-    'nvim-lua/plenary.nvim',
-    'sindrets/diffview.nvim',
-    'esmuellert/codediff.nvim',
-    'ibhagwan/fzf-lua',
-  },
-  config = function()
-    local neogit = require 'neogit'
+-- Neogit — Magit-style git UI (uses codediff for diffs).
+-- Lazy-loaded on :Neogit / <leader>gg (its setup is ~380ms when eager).
+vim.keymap.set('n', '<leader>gg', '<cmd>Neogit<cr>', { silent = true, noremap = true })
 
-    neogit.setup {
+require('custom.lazy').load {
+  src = 'https://github.com/NeogitOrg/neogit',
+  deps = {
+    'https://github.com/nvim-lua/plenary.nvim',
+    'https://github.com/sindrets/diffview.nvim',
+    'https://github.com/esmuellert/codediff.nvim',
+    'https://github.com/ibhagwan/fzf-lua',
+  },
+  cmd = 'Neogit',
+  setup = function()
+    require('neogit').setup {
       -- Hides the hints at the top of the status buffer
       disable_hint = false,
       -- Disables changing the buffer highlights based on where the cursor is.
@@ -362,8 +365,5 @@ return {
         },
       },
     }
-    vim.keymap.set('n', '<leader>gg', function()
-      vim.cmd 'Neogit'
-    end, { silent = true, noremap = true })
   end,
 }

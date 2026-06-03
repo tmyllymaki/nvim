@@ -1,11 +1,8 @@
-return {
-  'chrisgrieser/nvim-origami',
-  event = 'VeryLazy',
-  opts = {}, -- needed even when using default config
+-- nvim-origami — nicer folds.
+vim.pack.add { 'https://github.com/chrisgrieser/nvim-origami' }
 
-  -- recommended: disable vim's auto-folding
-  init = function()
-    vim.opt.foldlevel = 99
-    vim.opt.foldlevelstart = 99
-  end,
-}
+-- (was `init`) disable vim's auto-folding.
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+
+require('origami').setup {}

@@ -1,13 +1,12 @@
-return {
-  'pwntester/octo.nvim',
+-- octo.nvim — GitHub issues/PRs. Lazy-loaded on :Octo.
+-- (plenary, snacks, nvim-web-devicons are already loaded eagerly at startup.)
+require('custom.lazy').load {
+  src = 'https://github.com/pwntester/octo.nvim',
   cmd = 'Octo',
-  opts = {
-    picker = 'snacks',
-    enable_builtin = true,
-  },
-  dependencies = {
-    'nvim-lua/plenary.nvim',
-    'folke/snacks.nvim',
-    'nvim-tree/nvim-web-devicons',
-  },
+  setup = function()
+    require('octo').setup {
+      picker = 'snacks',
+      enable_builtin = true,
+    }
+  end,
 }

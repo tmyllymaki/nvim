@@ -1,14 +1,11 @@
-return {
-  'nicolasgb/jj.nvim',
-  dependencies = { 'sindrets/diffview.nvim' },
-  version = '*', -- Use latest stable release
-  -- Or from the main branch (uncomment the branch line and comment the version line)
-  -- branch = "main",
-  config = function()
-    require('jj').setup {
-      diff = {
-        backend = 'diffview',
-      },
-    }
-  end,
+-- jj.nvim — Jujutsu VCS integration.
+vim.pack.add {
+  'https://github.com/sindrets/diffview.nvim',
+  'https://github.com/nicolasgb/jj.nvim',
+}
+
+require('jj').setup {
+  diff = {
+    backend = 'diffview',
+  },
 }
