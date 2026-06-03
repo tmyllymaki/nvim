@@ -59,10 +59,7 @@ do
   vim.g.matchparen_insert_timeout = 2
   vim.opt.swapfile = false
 
-  -- Don't block the UI with a "hit-enter" prompt for long/multi-line messages;
-  -- display them briefly and auto-continue instead. Everything is still
-  -- available via `:messages`. Bump `wait` (max 10000) if 500ms is too quick.
-  vim.o.messagesopt = 'wait:500,history:500'
+
 
   -- Global statusline (so views can fully collapse).
   vim.opt.laststatus = 3
