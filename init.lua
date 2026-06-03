@@ -491,11 +491,15 @@ do
     others = {
       gleam = {},
       nixd = {
-        nixpkgs = {
-          expr = 'import <nixpkgs> { }',
-        },
-        formatting = {
-          command = { 'alejandra' },
+        settings = {
+          nixd = {
+            nixpkgs = {
+              expr = 'import <nixpkgs> { }',
+            },
+            formatting = {
+              command = { 'alejandra' },
+            },
+          },
         },
       },
     },
