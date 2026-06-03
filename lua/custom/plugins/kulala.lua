@@ -1,7 +1,7 @@
 return {
   {
     'mistweaverco/kulala.nvim',
-    ft = { 'http', 'rest' },
+    ft = { 'http', 'rest', 'javascript', 'lua' },
     opts = {
       global_keymaps = true,
       global_keymaps_prefix = '<leader>R',

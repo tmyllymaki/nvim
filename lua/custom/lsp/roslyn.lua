@@ -30,7 +30,7 @@ return {
             buffer = args.buf,
             callback = function()
               if vim.g.codelens_enabled then
-                vim.lsp.codelens.refresh { bufnr = args.buf }
+                vim.lsp.codelens.enable(true)
               end
             end,
           })
@@ -74,6 +74,5 @@ return {
         },
       },
     })
-    vim.lsp.enable 'roslyn'
   end,
 }

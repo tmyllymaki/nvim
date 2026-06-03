@@ -18,40 +18,47 @@ return {
     -- Options are not required
     dotnet.setup {
       lsp = {
-        enabled = false, -- We've set this up manually
+        enabled = false, -- Enable builtin roslyn lsp
+        set_fold_expr = false,
+        preload_roslyn = true, -- Start loading roslyn before any buffer is opened
         roslynator_enabled = true, -- Automatically enable roslynator analyzer
+        easy_dotnet_analyzer_enabled = true, -- Enable roslyn analyzer from easy-dotnet-server
+        auto_refresh_codelens = true,
+        suggest_updates = true, -- Periodically suggest roslyn-language-server updates
         analyzer_assemblies = {}, -- Any additional roslyn analyzers you might use like SonarAnalyzer.CSharp
-        settings = {
-          ['csharp|inlay_hints'] = {
-            csharp_enable_inlay_hints_for_implicit_object_creation = true,
-            csharp_enable_inlay_hints_for_implicit_variable_types = true,
+        config = {
+          settings = {
+            ['csharp|inlay_hints'] = {
+              csharp_enable_inlay_hints_for_implicit_object_creation = true,
+              csharp_enable_inlay_hints_for_implicit_variable_types = true,
 
-            csharp_enable_inlay_hints_for_lambda_parameter_types = true,
-            csharp_enable_inlay_hints_for_types = true,
-            dotnet_enable_inlay_hints_for_indexer_parameters = true,
-            dotnet_enable_inlay_hints_for_literal_parameters = true,
-            dotnet_enable_inlay_hints_for_object_creation_parameters = true,
-            dotnet_enable_inlay_hints_for_other_parameters = true,
-            dotnet_enable_inlay_hints_for_parameters = true,
-            dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-            dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-            dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-          },
-          ['csharp|code_lens'] = {
-            dotnet_enable_references_code_lens = true,
-          },
-          ['csharp|completion'] = {
-            dotnet_provide_regex_completions = true,
-            dotnet_show_name_completion_suggestions = true,
-            dotnet_show_completion_items_from_unimported_namespaces = true,
-          },
-          ['csharp|formatting'] = {
-            dotnet_organize_imports_on_format = true,
-          },
-          ['csharp|background_analysis'] = {
-            background_analysis = {
-              dotnet_analyzer_diagnostics_scope = 'fullSolution',
-              dotnet_compiler_diagnostics_scope = 'fullSolution',
+              csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+              csharp_enable_inlay_hints_for_types = true,
+              dotnet_enable_inlay_hints_for_indexer_parameters = true,
+              dotnet_enable_inlay_hints_for_literal_parameters = true,
+              dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+              dotnet_enable_inlay_hints_for_other_parameters = true,
+              dotnet_enable_inlay_hints_for_parameters = true,
+              dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+              dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+              dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+            },
+            ['csharp|code_lens'] = {
+              dotnet_enable_references_code_lens = true,
+            },
+            ['csharp|completion'] = {
+              dotnet_provide_regex_completions = true,
+              dotnet_show_name_completion_suggestions = true,
+              dotnet_show_completion_items_from_unimported_namespaces = true,
+            },
+            ['csharp|formatting'] = {
+              dotnet_organize_imports_on_format = true,
+            },
+            ['csharp|background_analysis'] = {
+              background_analysis = {
+                dotnet_analyzer_diagnostics_scope = 'fullSolution',
+                dotnet_compiler_diagnostics_scope = 'fullSolution',
+              },
             },
           },
         },
@@ -191,7 +198,7 @@ return {
     end, { desc = 'Open dotnet user-secrets' })
 
     vim.keymap.set('n', '<leader>ma', function()
-      Snacks.picker.files({
+      Snacks.picker.files {
         title = 'Select Directory for New File',
         cmd = 'fd --type d --hidden --exclude .git',
         confirm = function(picker, item)
@@ -202,7 +209,7 @@ return {
             dotnet.createfile(vim.fn.getcwd())
           end
         end,
-      })
+      }
     end, { desc = 'Create a new file' })
 
     vim.keymap.set('n', '<leader>tt', function()
