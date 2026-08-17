@@ -1,64 +1,64 @@
--- roslyn.nvim — C# language server.
--- NOTE: the previous lazy spec also set `opts = { broad_search, filewatching }`,
--- but because it used a `config` function those opts were never applied by lazy.
--- Preserved faithfully (not applied). mason registries are configured in
--- init.lua Section 5.
-vim.pack.add { 'https://github.com/seblyng/roslyn.nvim' }
-
--- Initialize codelens as enabled by default
-if vim.g.codelens_enabled == nil then
-  vim.g.codelens_enabled = true
-end
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client.name == 'roslyn' then
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-        buffer = args.buf,
-        callback = function()
-          if vim.g.codelens_enabled then
-            vim.lsp.codelens.enable(true)
-          end
-        end,
-      })
-    end
-  end,
-})
-
-vim.lsp.config('roslyn', {
-  settings = {
-    ['csharp|inlay_hints'] = {
-      csharp_enable_inlay_hints_for_implicit_object_creation = true,
-      csharp_enable_inlay_hints_for_implicit_variable_types = true,
-
-      csharp_enable_inlay_hints_for_lambda_parameter_types = true,
-      csharp_enable_inlay_hints_for_types = true,
-      dotnet_enable_inlay_hints_for_indexer_parameters = true,
-      dotnet_enable_inlay_hints_for_literal_parameters = true,
-      dotnet_enable_inlay_hints_for_object_creation_parameters = true,
-      dotnet_enable_inlay_hints_for_other_parameters = true,
-      dotnet_enable_inlay_hints_for_parameters = true,
-      dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-      dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-      dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-    },
-    ['csharp|code_lens'] = {
-      dotnet_enable_references_code_lens = true,
-    },
-    ['csharp|completion'] = {
-      dotnet_provide_regex_completions = true,
-      dotnet_show_name_completion_suggestions = true,
-      dotnet_show_completion_items_from_unimported_namespaces = true,
-    },
-    ['csharp|formatting'] = {
-      dotnet_organize_imports_on_format = true,
-    },
-    ['csharp|background_analysis'] = {
-      background_analysis = {
-        dotnet_analyzer_diagnostics_scope = 'fullSolution',
-        dotnet_compiler_diagnostics_scope = 'fullSolution',
-      },
-    },
-  },
-})
+-- -- roslyn.nvim — C# language server.
+-- -- NOTE: the previous lazy spec also set `opts = { broad_search, filewatching }`,
+-- -- but because it used a `config` function those opts were never applied by lazy.
+-- -- Preserved faithfully (not applied). mason registries are configured in
+-- -- init.lua Section 5.
+-- vim.pack.add { 'https://github.com/seblyng/roslyn.nvim' }
+--
+-- -- Initialize codelens as enabled by default
+-- if vim.g.codelens_enabled == nil then
+--   vim.g.codelens_enabled = true
+-- end
+--
+-- vim.api.nvim_create_autocmd('LspAttach', {
+--   callback = function(args)
+--     local client = vim.lsp.get_client_by_id(args.data.client_id)
+--     if client and client.name == 'roslyn' then
+--       vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+--         buffer = args.buf,
+--         callback = function()
+--           if vim.g.codelens_enabled then
+--             vim.lsp.codelens.enable(true)
+--           end
+--         end,
+--       })
+--     end
+--   end,
+-- })
+--
+-- vim.lsp.config('roslyn', {
+--   settings = {
+--     ['csharp|inlay_hints'] = {
+--       csharp_enable_inlay_hints_for_implicit_object_creation = true,
+--       csharp_enable_inlay_hints_for_implicit_variable_types = true,
+--
+--       csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+--       csharp_enable_inlay_hints_for_types = true,
+--       dotnet_enable_inlay_hints_for_indexer_parameters = true,
+--       dotnet_enable_inlay_hints_for_literal_parameters = true,
+--       dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+--       dotnet_enable_inlay_hints_for_other_parameters = true,
+--       dotnet_enable_inlay_hints_for_parameters = true,
+--       dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+--       dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+--       dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+--     },
+--     ['csharp|code_lens'] = {
+--       dotnet_enable_references_code_lens = true,
+--     },
+--     ['csharp|completion'] = {
+--       dotnet_provide_regex_completions = true,
+--       dotnet_show_name_completion_suggestions = true,
+--       dotnet_show_completion_items_from_unimported_namespaces = true,
+--     },
+--     ['csharp|formatting'] = {
+--       dotnet_organize_imports_on_format = true,
+--     },
+--     ['csharp|background_analysis'] = {
+--       background_analysis = {
+--         dotnet_analyzer_diagnostics_scope = 'fullSolution',
+--         dotnet_compiler_diagnostics_scope = 'fullSolution',
+--       },
+--     },
+--   },
+-- })

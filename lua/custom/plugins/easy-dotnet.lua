@@ -23,15 +23,30 @@ require('custom.lazy').load {
     local netcoredbg_path = resolve_netcoredbg()
     -- Options are not required
     dotnet.setup {
+      projx_lsp = {
+        enabled = true,
+      },
       lsp = {
-        enabled = false, -- Enable builtin roslyn lsp
+        enabled = true, -- Enable builtin roslyn lsp
         set_fold_expr = false,
         preload_roslyn = true, -- Start loading roslyn before any buffer is opened
         roslynator_enabled = true, -- Automatically enable roslynator analyzer
         easy_dotnet_analyzer_enabled = true, -- Enable roslyn analyzer from easy-dotnet-server
+        easy_dotnet_extension_enabled = false, -- Needs to be true for enhanced_rename and create_type_from_usage
+        enhanced_rename = false, -- auto rename file when renaming class
+        create_type_from_usage = false, -- code action for creating class from unresolved symbol in a separate file
+        restart_roslyn_on_branch_change = false, -- Restart Roslyn when Git HEAD changes
         auto_refresh_codelens = true,
         suggest_updates = true, -- Periodically suggest roslyn-language-server updates
         analyzer_assemblies = {}, -- Any additional roslyn analyzers you might use like SonarAnalyzer.CSharp
+        razor = {
+          enabled = true,
+          html = {
+            enabled = true,
+            cmd = nil, -- Auto-detect project node_modules/.bin/vscode-html-language-server, then PATH
+            request_timeout = 5000,
+          },
+        },
         config = {
           settings = {
             ['csharp|inlay_hints'] = {
@@ -147,7 +162,7 @@ require('custom.lazy').load {
       fsproj_mappings = true,
       auto_bootstrap_namespace = {
         --block_scoped, file_scoped
-        type = 'block_scoped',
+        type = 'file_scoped',
         enabled = true,
         use_clipboard_json = {
           behavior = 'prompt', --'auto' | 'prompt' | 'never',
@@ -168,9 +183,22 @@ require('custom.lazy').load {
         end,
       },
       debugger = {
-        bin_path = netcoredbg_path,
+        -- Path to custom coreclr DAP adapter
+        -- When set, this fully overrides `engine`; easy-dotnet-server uses this binary as-is.
+        -- When nil, easy-dotnet-server falls back to its own bundled debugger selected by `engine`.
+        bin_path = nil,
+        -- bin_path = netcoredbg_path,
+        -- Which bundled debugger to use when `bin_path` is nil.
+        --   "netcoredbg" (default) — Samsung netcoredbg
+        --   "dncdbg"               — viewizard/dncdbg (a fork of netcoredbg with a richer set of features)
+        --   "sharpdbg"             — MattParkerDev/sharpdbg (a new debugger written in C#)
+        engine = 'sharpdbg',
+        console = 'integratedTerminal', -- Controls where the target app runs: "integratedTerminal" (Neovim buffer) or "externalTerminal" (OS window)
         apply_value_converters = true,
         auto_register_dap = true,
+        -- Sample the debugged process' CPU/memory usage so the `easy-dotnet_cpu` and `easy-dotnet_mem`
+        -- dapui widgets have data to draw. Set to false to turn sampling off and unregister the widgets.
+        mem_cpu_usage = true,
         mappings = {
           open_variable_viewer = { lhs = 'T', desc = 'open variable viewer' },
         },
