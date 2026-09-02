@@ -21,7 +21,12 @@
 --     so the real command/mapping (defined by the plugin) takes over.
 --   - `ft` re-fires FileType after loading so the plugin attaches to the buffer
 --     that triggered it.
+--   - Every spec is recorded; `M.install_all()` / `:PackInstallAll` force-loads
+--     them all (installing without prompts), e.g. after a fresh clone.
 local M = {}
+
+local registry = {} ---@type { name: string, load: fun() }[]
+local installing_all = false
 
 local function plugin_name(spec)
   return spec.name or (spec.src and spec.src:gsub('%.git$', ''):match '[^/]+$') or 'lazy-plugin'
@@ -55,7 +60,7 @@ function M.load(spec)
       specs[#specs + 1] = { src = spec.src, name = spec.name, version = spec.version }
     end
     if #specs > 0 then
-      vim.pack.add(specs)
+      vim.pack.add(specs, { confirm = not installing_all })
     end
     if spec.setup then
       spec.setup()
@@ -119,7 +124,32 @@ function M.load(spec)
     end
   end
 
+  registry[#registry + 1] = { name = plugin_name(spec), load = do_load }
   return do_load
 end
+
+--- Install and load every lazily-registered plugin right now, skipping the
+--- per-plugin install confirmation. Plugins stay lazy in later sessions; this
+--- just ensures they are on disk.
+function M.install_all()
+  installing_all = true
+  local failed = {}
+  for _, p in ipairs(registry) do
+    local ok, err = pcall(p.load)
+    if not ok then
+      failed[#failed + 1] = ('%s: %s'):format(p.name, err)
+    end
+  end
+  installing_all = false
+  if #failed > 0 then
+    vim.notify('PackInstallAll: some plugins failed to load:\n' .. table.concat(failed, '\n'), vim.log.levels.ERROR)
+  else
+    vim.notify(('PackInstallAll: %d lazy plugin(s) installed and loaded.'):format(#registry), vim.log.levels.INFO)
+  end
+end
+
+vim.api.nvim_create_user_command('PackInstallAll', function()
+  M.install_all()
+end, { desc = 'Install and load all lazily-registered vim.pack plugins' })
 
 return M
