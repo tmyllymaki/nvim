@@ -5,58 +5,23 @@ local function link_chat_to_normal()
   vim.api.nvim_set_hl(0, 'SidekickChat', { link = 'Normal' })
 end
 
-local modal_float = { width = 0.9, height = 0.9, border = 'rounded' }
-local fullscreen_float = { width = 1.0, height = 1.0, border = 'none' }
-
-local fullscreen = false
-
-local function toggle_fullscreen()
-  fullscreen = not fullscreen
-  local size = fullscreen and fullscreen_float or modal_float
-
-  local ok_cfg, Config = pcall(require, 'sidekick.config')
-  if ok_cfg and Config.cli and Config.cli.win then
-    Config.cli.win.float = vim.tbl_deep_extend('force', Config.cli.win.float or {}, size)
-  end
-
-  local ok_term, Terminal = pcall(require, 'sidekick.cli.terminal')
-  if not ok_term then
-    return
-  end
-  for _, t in pairs(Terminal.terminals or {}) do
-    t.opts.float = vim.tbl_deep_extend('force', t.opts.float or {}, size)
-    if t:is_open() then
-      local refocus = t:is_focused()
-      t:hide()
-      t:show()
-      if refocus then
-        t:focus()
-      end
-    end
-  end
-  vim.notify('Sidekick: ' .. (fullscreen and 'fullscreen' or 'modal'), vim.log.levels.INFO)
-end
-
--- (was `init`) Keep the chat background linked to Normal and expose a command.
+-- Keep the chat background linked to Normal across colorscheme changes.
 vim.api.nvim_create_autocmd('ColorScheme', {
   group = vim.api.nvim_create_augroup('SidekickChatBg', { clear = true }),
   callback = link_chat_to_normal,
 })
 link_chat_to_normal()
-vim.api.nvim_create_user_command('SidekickToggleFullscreen', toggle_fullscreen, {
-  desc = 'Toggle Sidekick between modal and fullscreen float',
-})
 
 require('sidekick').setup {
   nes = {
     enabled = true,
   },
   cli = {
-    tools = {
-      claude = {
-        cmd = { 'sandboxed-claude', '--dangerously-skip-permissions' },
-      },
-    },
+    -- tools = {
+    --   claude = {
+    --     cmd = { 'sandboxed-claude', '--dangerously-skip-permissions' },
+    --   },
+    -- },
     win = {
       layout = 'float',
       float = {
@@ -84,7 +49,11 @@ vim.keymap.set({ 'n', 't', 'i', 'x' }, '<C-,>', function()
   require('sidekick.cli').toggle()
 end, { desc = 'Sidekick Toggle' })
 
-vim.keymap.set({ 'n', 't' }, '<leader>aF', toggle_fullscreen, { desc = 'Sidekick Toggle Fullscreen' })
+-- Modal <-> fullscreen layout toggle, shared with the snacks terminal (<C-ö>).
+local float_layout = require 'custom.float_layout'
+vim.keymap.set({ 'n', 't' }, '<leader>aF', function()
+  float_layout.toggle()
+end, { desc = 'Toggle Float Fullscreen' })
 
 vim.keymap.set('n', '<leader>aa', function()
   require('sidekick.cli').toggle()
