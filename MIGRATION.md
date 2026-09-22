@@ -40,8 +40,9 @@ vim.keymap.set(...)                    -- from each keys= entry
   the API changes and the one-time `vim.pack.update()` step required to switch.
 - **Picker = snacks** (not Telescope). Telescope kept only as an orgmode/swift
   dependency.
-- **Colorscheme**: dynamic macOS/Linux theme detector (carbonfox/dayfox via
-  nightfox) ported to Section 3; full theme list kept in `themes.lua`.
+- **Colorscheme**: dynamic macOS/Linux theme detector ported to Section 3. It
+  picks the dark/light variant of the family in `$COLOR_THEME` (kanso,
+  kanagawa-paper or github); full theme list kept in `themes.lua`.
 - **netcoredbg path**: resolved via `nvim_get_runtime_file` (the old hardcoded
   `…/lazy/…` path breaks under vim.pack).
 - **mason registries** (mason-org + crashdummyy) consolidated into Section 5.

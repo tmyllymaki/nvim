@@ -1,7 +1,10 @@
--- Colorscheme options. The active scheme (carbonfox/dayfox via nightfox) is
--- selected by the system-theme detector in init.lua Section 3. The rest are
--- available for manual `:colorscheme` switching.
+-- Colorscheme options. The active dark/light pair is selected by the
+-- system-theme detector in init.lua Section 3. The rest remain available for
+-- manual `:colorscheme` switching.
 vim.pack.add {
+  'https://github.com/webhooked/kanso.nvim',
+  'https://github.com/thesimonho/kanagawa-paper.nvim',
+  { src = 'https://github.com/projekt0n/github-nvim-theme', name = 'github-theme' },
   'https://github.com/miikanissi/modus-themes.nvim',
   'https://github.com/datsfilipe/vesper.nvim',
   'https://github.com/vague-theme/vague.nvim',
@@ -17,5 +20,11 @@ vim.pack.add {
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
 }
 
+require('kanso').setup {
+  minimal = true,
+  background = { dark = 'ink', light = 'pearl' },
+}
+require('kanagawa-paper').setup {}
+require('github-theme').setup {}
 require('tokyonight').setup {}
 require('gruvbox').setup {}

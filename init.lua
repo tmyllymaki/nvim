@@ -336,9 +336,9 @@ do
   end
 
   -- [[ Colorscheme ]]
-  -- nightfox provides the active schemes (carbonfox/dayfox); the full theme
-  -- list lives in lua/custom/plugins/themes.lua.
-  vim.pack.add { gh 'EdenEast/nightfox.nvim' }
+  -- Register themes before selecting one. The custom plugin loader requires
+  -- this module again later, which is harmless because Lua caches modules.
+  require 'custom.plugins.themes'
 
   local function get_system_theme()
     local system = vim.loop.os_uname().sysname
@@ -364,16 +364,55 @@ do
     return 'dark'
   end
 
-  local function set_theme_from_system()
-    if get_system_theme() == 'dark' then
-      vim.cmd.colorscheme 'carbonfox'
-    else
-      vim.cmd.colorscheme 'dayfox'
+  -- Family names are duplicated in dotfiles/wezterm/themes.lua,
+  -- modules/home/wezterm.nix and fish/config.fish in the nix-darwin repo.
+  local theme_pairs = {
+    kanso = { dark = 'kanso-ink', light = 'kanso-pearl' },
+    ['kanagawa-paper'] = { dark = 'kanagawa-paper-ink', light = 'kanagawa-paper-canvas' },
+    github = { dark = 'github_dark', light = 'github_light' },
+  }
+
+  -- Explicit COLOR_THEME (exported by wezterm) wins, then the file nix writes
+  -- from custom.home.wezterm.theme, then kanso.
+  local function get_theme_family()
+    local family = vim.env.COLOR_THEME
+    if not family or family == '' then
+      local lines = vim.fn.filereadable(vim.fn.expand '~/.config/color-theme') == 1
+          and vim.fn.readfile(vim.fn.expand '~/.config/color-theme', '', 1)
+        or {}
+      family = vim.trim(lines[1] or '')
     end
+    return theme_pairs[family] and family or 'kanso'
   end
 
-  vim.o.background = get_system_theme()
-  set_theme_from_system()
+  local theme_family = get_theme_family()
+  local applied_appearance = nil
+
+  -- Apply the colorscheme for the current system appearance. Without `force`,
+  -- an unchanged appearance is a no-op so a manual `:colorscheme` survives
+  -- focus changes.
+  local function set_theme_from_system(force)
+    local appearance = get_system_theme()
+    if not force and appearance == applied_appearance then
+      return
+    end
+    applied_appearance = appearance
+    vim.o.background = appearance
+    vim.cmd.colorscheme(theme_pairs[theme_family][appearance])
+  end
+
+  set_theme_from_system(true)
+
+  vim.api.nvim_create_user_command('ThemeSync', function()
+    set_theme_from_system(true)
+  end, { desc = 'Sync the colorscheme with the system appearance' })
+  vim.api.nvim_create_autocmd({ 'FocusGained', 'VimResume' }, {
+    group = vim.api.nvim_create_augroup('system-theme', { clear = true }),
+    callback = function()
+      set_theme_from_system(false)
+    end,
+    desc = 'Sync the colorscheme with the system appearance when it changes',
+  })
 end
 
 -- ============================================================
@@ -887,4 +926,3 @@ end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
-
