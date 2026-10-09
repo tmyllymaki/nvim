@@ -46,7 +46,11 @@ vim.keymap.set('n', '<Tab>', function()
 end, { expr = true, desc = 'NES / Tab' })
 
 vim.keymap.set({ 'n', 't', 'i', 'x' }, '<C-,>', function()
-  require('sidekick.cli').toggle()
+  if require('custom.float_layout').hide_snacks() then
+    require('sidekick.cli').show { focus = true }
+  else
+    require('sidekick.cli').toggle()
+  end
 end, { desc = 'Sidekick Toggle' })
 
 -- Modal <-> fullscreen layout toggle, shared with the snacks terminal (<C-ö>).

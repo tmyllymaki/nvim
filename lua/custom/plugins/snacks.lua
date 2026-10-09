@@ -47,7 +47,14 @@ map('n', '[[', function() Snacks.words.jump(-1, true) end, { desc = 'Prev Refere
 map('n', '<leader>un', function() Snacks.notifier.show_history() end, { desc = 'Notification History' })
 map('n', '<leader>uN', function() Snacks.notifier.hide() end, { desc = 'Dismiss Notifications' })
 -- terminal
-map({ 'n', 't' }, "<C-'>", function() Snacks.terminal.toggle() end, { desc = 'Toggle Terminal' })
+map({ 'n', 't' }, "<C-'>", function()
+  local term = Snacks.terminal.get(nil, { create = false })
+  if require('custom.float_layout').hide_sidekick() and term and term:valid() then
+    term:focus()
+  else
+    Snacks.terminal.toggle()
+  end
+end, { desc = 'Toggle Terminal' })
 -- picker: search
 map('n', '<leader>sh', function() Snacks.picker.help() end, { desc = 'Search Help' })
 map('n', '<leader>sk', function() Snacks.picker.keymaps() end, { desc = 'Search Keymaps' })

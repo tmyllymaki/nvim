@@ -96,6 +96,33 @@ function M.toggle(opts)
   end
 end
 
+-- The two floats cover each other, so only one should be visible at a time.
+-- Each returns true if it hid something, meaning the caller's float was
+-- covered and should be raised instead of toggled off.
+
+function M.hide_sidekick()
+  local ok, Terminal = pcall(require, 'sidekick.cli.terminal')
+  local hid = false
+  for _, t in pairs(ok and Terminal.terminals or {}) do
+    if t:is_open() then
+      t:hide()
+      hid = true
+    end
+  end
+  return hid
+end
+
+function M.hide_snacks()
+  local hid = false
+  for _, term in ipairs(Snacks.terminal.list()) do
+    if term.opts.position == 'float' and term:valid() then
+      term:hide()
+      hid = true
+    end
+  end
+  return hid
+end
+
 vim.api.nvim_create_user_command('ToggleFloatLayout', function()
   M.toggle()
 end, { desc = 'Toggle terminal/sidekick floats between modal and fullscreen' })
