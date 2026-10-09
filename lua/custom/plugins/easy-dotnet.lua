@@ -36,7 +36,7 @@ require('custom.lazy').load {
         enhanced_rename = false, -- auto rename file when renaming class
         create_type_from_usage = false, -- code action for creating class from unresolved symbol in a separate file
         restart_roslyn_on_branch_change = false, -- Restart Roslyn when Git HEAD changes
-        auto_refresh_codelens = true,
+        auto_refresh_codelens = false, -- Code lens is enabled and toggled in init.lua (<leader>tl)
         suggest_updates = true, -- Periodically suggest roslyn-language-server updates
         analyzer_assemblies = {}, -- Any additional roslyn analyzers you might use like SonarAnalyzer.CSharp
         razor = {

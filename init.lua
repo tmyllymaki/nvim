@@ -495,12 +495,7 @@ do
 
       if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_codeLens, event.buf) then
         map('<leader>tl', function()
-          vim.g.codelens_enabled = not vim.g.codelens_enabled
-          if vim.g.codelens_enabled then
-            vim.lsp.codelens.refresh { bufnr = event.buf }
-          else
-            vim.lsp.codelens.clear(nil, event.buf)
-          end
+          vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled { bufnr = event.buf }, { bufnr = event.buf })
         end, '[T]oggle Code[L]ens')
       end
     end,
