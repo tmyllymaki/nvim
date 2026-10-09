@@ -1,7 +1,7 @@
 -- obsidian.nvim — notes/vault integration. Lazy-loaded on :Obsidian / markdown.
 -- (~80ms when eager.) Keymaps stay eager; the `<cmd>Obsidian …>` ones trigger
 -- the lazy load via the command stub, the rest work standalone.
-local vault_path = vim.fn.expand '~/projects/Obsidian/Work'
+local vault_path = vim.fn.expand '~/Documents/work'
 
 require('custom.lazy').load {
   src = 'https://github.com/obsidian-nvim/obsidian.nvim',
