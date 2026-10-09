@@ -20,6 +20,8 @@ require('snacks').setup {
     },
   },
   gitbrowse = { enabled = true },
+  -- Sidebar tree. oil keeps the directory-buffer hijack, so netrw replacement is off.
+  explorer = { enabled = true, replace_netrw = false },
   picker = {
     enabled = true,
     sources = {
@@ -46,6 +48,8 @@ map('n', '[[', function() Snacks.words.jump(-1, true) end, { desc = 'Prev Refere
 -- notifier
 map('n', '<leader>un', function() Snacks.notifier.show_history() end, { desc = 'Notification History' })
 map('n', '<leader>uN', function() Snacks.notifier.hide() end, { desc = 'Dismiss Notifications' })
+-- explorer
+map('n', '<leader>E', function() Snacks.explorer() end, { desc = 'File Explorer (sidebar)' })
 -- terminal
 map({ 'n', 't' }, "<C-'>", function()
   local term = Snacks.terminal.get(nil, { create = false })
@@ -79,3 +83,5 @@ map('n', 'gd', function() Snacks.picker.lsp_definitions() end, { desc = 'Goto De
 map('n', 'gO', function() Snacks.picker.lsp_symbols() end, { desc = 'Document Symbols' })
 map('n', 'gW', function() Snacks.picker.lsp_workspace_symbols() end, { desc = 'Workspace Symbols' })
 map('n', 'grt', function() Snacks.picker.lsp_type_definitions() end, { desc = 'Goto Type Definition' })
+map('n', "<leader>.",  function() Snacks.scratch() end, {desc = "Toggle Scratch Buffer" })
+map('n', "<leader>S",  function() Snacks.scratch.select() end, {desc = "Select Scratch Buffer" })
