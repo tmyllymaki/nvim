@@ -365,5 +365,34 @@ require('custom.lazy').load {
         },
       },
     }
+
+    -- Shim for neogit#2008: the codediff integration still passes the legacy
+    -- `original_path`/`modified_path` strings, but codediff >= v2.50.0 (fe7ab20)
+    -- requires typed Path refs (`original`/`modified`), and >= 2.67.9 also
+    -- replaced `mode`/`explorer_data` with a `panel` descriptor.
+    do
+      local ok, view = pcall(require, 'codediff.ui.view')
+      if ok and type(view.create) == 'function' and not view.__neogit_legacy_shim then
+        view.__neogit_legacy_shim = true
+        local orig_create = view.create
+        local path = require('codediff.core.path')
+        view.create = function(session_config, filetype, on_ready)
+          if type(session_config) == 'table' then
+            if not session_config.original and session_config.original_path then
+              session_config.original = path.make_ref(session_config.original_path, session_config.git_root)
+            end
+            if not session_config.modified and session_config.modified_path then
+              session_config.modified = path.make_ref(session_config.modified_path, session_config.git_root)
+            end
+            if session_config.mode == 'explorer' and not session_config.panel then
+              session_config.panel = { name = 'explorer', data = session_config.explorer_data or {} }
+              session_config.original = session_config.original or path.empty()
+              session_config.modified = session_config.modified or path.empty()
+            end
+          end
+          return orig_create(session_config, filetype, on_ready)
+        end
+      end
+    end
   end,
 }
