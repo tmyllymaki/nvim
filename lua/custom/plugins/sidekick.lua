@@ -14,7 +14,7 @@ link_chat_to_normal()
 
 require('sidekick').setup {
   nes = {
-    enabled = true,
+    enabled = false,
   },
   cli = {
     -- tools = {
